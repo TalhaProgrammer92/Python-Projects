@@ -1,3 +1,4 @@
+import time as t
 """
 ========================================================================
 INFO: Program to print the following house pattern in Python
@@ -23,14 +24,20 @@ INFO: Program to print the following house pattern in Python
 ::::::::::::IIIII::::::::::::
 """
 
+sec = 0.05
+
 def printSequence(character: str, limit: int) -> None:
-    print(character*limit, end='')
+    for count in range(limit):
+        t.sleep(sec)
+        print(character, end='')
 
 def printSequenceGap(character: str, limit: int) -> None:
     for count in range(limit):
+        t.sleep(sec)
         print(character, end='')
         if count != limit-1:
             print(' ', end='')
+
 
 class House:
     def __init__(self) -> None:
@@ -59,9 +66,10 @@ class House:
         self.__row -= 2
 
     def __drawBody(self) -> None:
-        for count in range(10):
+        size = 8
+        for count in range(size):
             # NOTE: The value of self.__row is 29, 29 / 2 (int) -> 14 - 2 => 12 + 12 => 24 - 29 (abs) => 5
-            if count < 5:
+            if count < size / 2:
                 printSequence(':', self.__row)
             else:
                 printSequence(':', int(self.__row / 2) - 2)
