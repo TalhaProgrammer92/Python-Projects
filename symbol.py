@@ -252,8 +252,7 @@ class Program:
                     case '~':
                         self.__stacks.stacks[stack_pointer].cells[cell_pointer].bitwise_not()
                     case '^':
-                        value: int = self.__stacks.stacks[stack_pointer].cells[cell_pointer + 1].value if cell_pointer < 7 else \
-                        self.__stacks.stacks[stack_pointer].cells[cell_pointer - 1].value
+                        value: int = self.__stacks.stacks[stack_pointer].cells[cell_pointer + 1].value if cell_pointer < 7 else self.__stacks.stacks[stack_pointer].cells[cell_pointer - 1].value
                         self.__stacks.stacks[stack_pointer].cells[cell_pointer].bitwise_xor(value)
 
                     #################
