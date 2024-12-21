@@ -43,7 +43,7 @@ class Cell:
 
     def half(self) -> None:
         """ To half the cell's value """
-        self.__value = int(self.__value / 2 if int(self.value / 2) >= 0 else 1)
+        self.__value = int(self.__value / 2 if int(self.value * 2) >= 0 else 1)
 
     def bitwise_and(self, value: int) -> None:
         """ Perform bitwise AND operation """
@@ -144,7 +144,7 @@ class Memory:
 
     def to_next(self) -> None:
         """ Goto next cell in the memory """
-        self.__pointer += 1 if self.__pointer < self.__limit - 1 else 0
+        self.__pointer += 1 if self.__pointer < len(self.stacks) - 1 else 0
 
     def to_previous(self) -> None:
         """ Goto previous cell in the memory """
@@ -156,7 +156,7 @@ class Memory:
 
     def jump_end(self) -> None:
         """ Goto last cell in the memory """
-        self.__pointer = self.__limit - 1
+        self.__pointer = len(self.stacks) - 1
 
 
 ##############################
@@ -201,15 +201,6 @@ class Program:
     ##############
     def write(self, source_code: str) -> None:
         """ To write program """
-        # coding: bool = True
-        # count = 1
-        # while coding:
-        #     print(count, end=' ')
-        #     statement: str = input()
-        #     self.__source_code += statement
-        #     if '.' in statement:
-        #         coding = False
-        #     count += 1
         self.__source_code = source_code
 
     def load(self) -> None:
@@ -285,7 +276,7 @@ class Program:
                     case '!':
                         self.__stacks.stacks[stack_pointer].reset()
         else:
-            tmsg.showerror('Error', 'Empty code space or you must compile the program first.')
+            tmsg.showerror('Error', 'You must compile the program first.')
 
     def save(self) -> None:
         """ To save the program in text file """
@@ -308,7 +299,7 @@ class Editor(tk.Tk):
 
         self.geometry('800x600')
         self.minsize(640, 400)
-        self.maxsize(1034, 800)
+        self.maxsize(1024, 600)
         self.title('Untitled - Symbol')
         if os.path.exists('symbols.ico'):
             self.wm_iconbitmap('symbols.ico')
@@ -385,12 +376,12 @@ class Editor(tk.Tk):
         """ To compile the written code """
         self.__source_code.write(self.__code_area.get('1.0', tk.END))
         tmsg.showinfo('Compiled', 'The program has been compiled successfully')
+        self.__source_code.load()
         # print(self.__code_area.get('1.0', tk.END))
 
     def __run_code(self) -> None:
         """ To run the compiled code """
-        os.system('cls')            # For Mac/Linux os.system('clear')
-        self.__source_code.load()
+        # os.system('cls')            # For Mac/Linux os.system('clear')
         self.__source_code.execute()
         self.__source_code.clear()
 
