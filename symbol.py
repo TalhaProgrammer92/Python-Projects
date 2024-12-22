@@ -278,9 +278,15 @@ class Program:
         else:
             tmsg.showerror('Error', 'You must compile the program first.')
 
-    def save(self) -> None:
+    def extract(self) -> None:
         """ To save the program in text file """
-        pass
+        if len(self.__tokens) > 0:
+            print()
+            for token in self.__tokens:
+                print(token.symbol, end='')
+            print()
+        else:
+            tmsg.showerror('Error', 'You must compile the program first.')
 
     def clear(self) -> None:
         """ To clear the source code """
@@ -318,13 +324,14 @@ class Editor(tk.Tk):
 
     def __open_file(self) -> None:
         """ Opens an existing file """
-        self.__source_file = tfdg.askopenfilename(defaultextension='.txt', filetypes=[('Text Documents', '*.txt')])
+        # self.__source_file = tfdg.askopenfilename(defaultextension='.txt', filetypes=[('Text Documents', '*.txt')])
+        self.__source_file = tfdg.askopenfilename(defaultextension='.txt', filetypes=[('Text Documents', '*.sym')])
 
         if self.__source_file == '':
             self.__source_file = None
 
         else:
-            self.title(os.path.basename(self.__source_file[:self.__source_file.index('.')]) + ' - Symbol')
+            self.title(os.path.basename(self.__source_file[:-4]) + ' - Symbol')
             self.__code_area.delete('1.0', tk.END)
 
             with open(self.__source_file, 'r') as file:
@@ -334,7 +341,8 @@ class Editor(tk.Tk):
     def __save_file(self) -> None:
         """ Saves an opened file """
         if self.__source_file is None:
-            self.__source_file = tfdg.asksaveasfilename(initialfile='.txt', defaultextension='.txt', filetypes=[('Text Documents', '*.txt')])
+            # self.__source_file = tfdg.asksaveasfilename(initialfile='.txt', defaultextension='.txt', filetypes=[('Text Documents', '*.txt')])
+            self.__source_file = tfdg.asksaveasfilename(initialfile='.sym', defaultextension='.sym', filetypes=[('Text Documents', '*.sym')])
 
             if self.__source_file == '':
                 self.__source_file = None
@@ -385,9 +393,9 @@ class Editor(tk.Tk):
         self.__source_code.execute()
         self.__source_code.clear()
 
-    def __debug_code(self) -> None:
+    def __extract_code(self) -> None:
         """ To debug the code """
-        pass
+        self.__source_code.extract()
 
     def __open_guide(self) -> None:
         """ To open a helping guide to guide the programmer to program in this language """
@@ -482,7 +490,8 @@ _ is used to add a new stack a new stack in memory
 
         code_menu.add_command(label='Compile', command=self.__compile_code)
         code_menu.add_command(label='Run', command=self.__run_code)
-        code_menu.add_command(label='Debug', command=self.__debug_code)
+        code_menu.add_separator()
+        code_menu.add_command(label='Extract Symbols', command=self.__extract_code)
 
         menu_bar.add_cascade(label='Code', menu=code_menu)
 
