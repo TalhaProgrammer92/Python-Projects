@@ -9,7 +9,7 @@ def clear_console():
     """ Clear the console / terminal screen """
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def print_colored(text: str, color: str) -> None:
+def printColored(text: str, color: str, end='') -> None:
     """
       Prints the given text in the specified color to the console.
 
@@ -22,22 +22,46 @@ def print_colored(text: str, color: str) -> None:
     None
     """
     colors = {
-      'red': '\033[91m',
-      'green': '\033[92m',
-      'yellow': '\033[93m',
-      'blue': '\033[94m',
-      'magenta': '\033[95m',
-      'cyan': '\033[96m',
-      'white': '\033[97m',
-      'reset': '\033[0m'
+    'black': '\033[30m',
+    'red': '\033[31m',
+    'green': '\033[32m',
+    'yellow': '\033[33m',
+    'blue': '\033[34m',
+    'magenta': '\033[35m',
+    'cyan': '\033[36m',
+    'white': '\033[37m',
+    'reset': '\033[0m',
+    'bright-black': '\033[90m',
+    'bright-red': '\033[91m',
+    'bright-green': '\033[92m',
+    'bright-yellow': '\033[93m',
+    'bright-blue': '\033[94m',
+    'bright-magenta': '\033[95m',
+    'bright-cyan': '\033[96m',
+    'bright-white': '\033[97m',
     }
 
     color = color.lower()
 
     if color in colors:
-        print(f"{colors[color]}{text}{colors['reset']}", end='')
+        print(f"{colors[color]}{text}{colors['reset']}", end=end)
     else:
         print(f"Invalid color: {color}. Available colors: {list(colors.keys())}")
+
+def takeInput(prompt: str, valid_nums: list[int], color: str = 'white') -> int:
+    """ To take valid from user """
+    while True:
+        try:
+            printColored(prompt, color)
+            num: int = int(input())
+            if num in valid_nums:
+                break
+            else:
+                printColored('Out of range!', 'red', '\n')
+        except Exception:
+            printColored('Invalid Input!', 'red', '\n')
+
+    return num
 
 
 ######################
@@ -47,6 +71,7 @@ class Player:
     def __init__(self, name: str):
         self.__name: str = name
         self.__score: int = 0
+        self.__scores: list[int] = []
 
     @property
     def score(self) -> int:
@@ -59,8 +84,25 @@ class Player:
     def incrementScore(self) -> None:
         self.__score += 1
 
+    def reset(self) -> None:
+        """ To reset player's score """
+        self.__score = 0
+        self.__scores.append(self.score)
+
+    def restart(self) -> None:
+        """ To make player as fresher """
+        self.__score = 0
+        self.__scores = []
+
+    def showHistory(self) -> None:
+        """ Display the history of player """
+        text: str = '*' * 5 + f' {self.name}\'s ' + '*' * 5
+        printColored(text, 'magenta', '\n')
+        for score in self.__scores:
+            printColored(f'Game # {self.__scores.index(score) + 1}\'s Score is {score}', 'cyan')
+
     def __repr__(self) -> str:
-        return f'{self.__name} : {self.__score}'
+        return f'{self.name} : {self.score}'
 
 
 ######################
@@ -95,28 +137,28 @@ class Board:
         """ To display the board """
 
         # Number - Row
-        print('\t', end='')
+        print(' ' * 3, end='')
         for i in range(9):
-            print_colored(f'  {i} ', 'red')
+            printColored(f'  {i} ', 'bright-red')
         print()
 
         # The Board
         for i in range(9):
-            print_colored(str(i), 'red')            # Number - Column
-            print_colored(f'\t|', 'magenta')
+            printColored(str(i), 'bright-red')            # Number - Column
+            printColored(f'  |', 'bright-magenta')
 
             for j in range(9):
                 cell: str = f' {self.__board[i][j]} '
 
                 if self.__board[i][j] == '-':
-                    print_colored(cell, 'cyan')
+                    printColored(cell, 'cyan')
                 else:
                     if not self.__combination_found[i][j]:
-                        print_colored(cell, 'yellow')
+                        printColored(cell, 'yellow')
                     else:
-                        print_colored(cell, 'green')
+                        printColored(cell, 'bright-green')
 
-                print_colored('|', 'magenta')
+                printColored('|', 'bright-magenta')
 
             print()
 
@@ -130,9 +172,11 @@ class Board:
         return self.__board[i][j]
 
     def isCombinationFound(self, i: int, j: int) -> bool:
+        """ Checks if there is a combination or not """
         return self.__combination_found[i][j]
 
     def combinationFoundAt(self, i: int, j: int) -> None:
+        """ Ensures that a combination found at given location """
         self.__combination_found[i][j] = True
 
 
@@ -264,20 +308,6 @@ class Game:
         for player in self.__players:
             print(player, end='\n\n')
 
-    def __takeInput(self, prompt: str, valid_nums: list[int]) -> int:
-        """ To take valid from user """
-        while True:
-            try:
-                num: int = int(input(prompt))
-                if num in valid_nums:
-                    break
-                else:
-                    print('Invalid Input!')
-            except Exception:
-                print('Invalid Input!')
-
-        return num
-
     def play(self) -> None:
         """ To play the game """
         s = ('S', 'O')
@@ -289,10 +319,10 @@ class Game:
             self.__board.display()
 
             # Get location
-            print(self.__players[self.__turn].name + '\'s Turn:')
-            i: int = self.__takeInput('Enter location for row>> ', [n for n in range(9)])
-            j: int = self.__takeInput('Enter location for column>> ', [n for n in range(9)])
-            c: int = self.__takeInput('1: S, 2: O (Single Digit)>> ', [1, 2])
+            printColored('\n' + self.__players[self.__turn].name + '\'s Turn:', 'blue', '\n')
+            i: int = takeInput('Enter location for row>> ', [n for n in range(9)], 'blue')
+            j: int = takeInput('Enter location for column>> ', [n for n in range(9)], 'blue')
+            c: int = takeInput('1: S, 2: O (Single Digit)>> ', [1, 2], 'blue')
             board.place(i, j, s[c - 1])
 
             # Clear the screen
@@ -308,14 +338,37 @@ class Game:
         self.__board.display()
         self.__displayResult()
 
-        # Hold the screen
-        a = input('\nPress \'Enter\' to exit...')
+        # Replay or else
+        option: int = takeInput('\n1-Restart, 2-Replay, 3-All Scores, 4-Exit', [n + 1 for n in range(4)], 'blue')
+
+        match option:
+            # Restart Game (Start a new game)
+            case 1:
+                self.__board.clear()
+                for player in self.__players:
+                    player.restart()
+                self.play()
+
+            # Replay Game (Start next game)
+            case 2:
+                self.__board.clear()
+                for player in self.__players:
+                    player.reset()
+                self.play()
+
+            # Display all Scores
+            case 3:
+                for player in self.__players:
+                    player.showHistory()
+
+            case 4:
+                exit()
 
 
 if __name__ == '__main__':
     # Players
     p1 = Player('Talha')
-    p2 = Player('Raza')
+    p2 = Player('Amelia')
 
     # Objects
     players = [p1, p2]
