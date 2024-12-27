@@ -190,27 +190,22 @@ class Game:
     def __checkCombinationAt(self, rows: list[int], cols: list[int]) -> None:
         """ To check if there is a combination exist at given location """
         if not self.__isAlreadyFound(rows, cols):
+            if self.__containCombination(rows, cols):
+                self.__players[self.__turn].incrementScore()
 
-            if len(rows) == 3 and len(cols) == 3:
-                if self.__containCombination(rows, cols):
-                    self.__players[self.__turn].incrementScore()
-
+                if len(rows) == 3 and len(cols) == 3:
                     for i in range(3):
                         self.__board.combinationFoundAt(rows[i], cols[i])
 
-            elif len(rows) == 3 and len(cols) == 1:
-                if self.__containCombination(rows, cols):
-                    self.__players[self.__turn].incrementScore()
-
+                elif len(rows) == 3 and len(cols) == 1:
                     for row in rows:
                         self.__board.combinationFoundAt(row, cols[0])
 
-            elif len(rows) == 1 and len(cols) == 3:
-                if self.__containCombination(rows, cols):
-                    self.__players[self.__turn].incrementScore()
-
+                elif len(rows) == 1 and len(cols) == 3:
                     for col in cols:
                         self.__board.combinationFoundAt(rows[0], col)
+
+                self.__turn -= 1    # To give the player an extra turn (Rule: If he completes "SOS")
 
     def __checkCombination(self, row: int, col: int, letter: str) -> None:
         """ To find a combination 'SOS' in the board and update player's score """
@@ -260,24 +255,28 @@ class Game:
                 except Exception:
                     pass
 
-    def __players_info(self) -> None:
+    def __displayResult(self) -> None:
         """ To display information of all players """
+        # Show board
+        self.__board.display()
+
+        # Players Information
         for player in self.__players:
             print(player, end='\n\n')
 
-    def __take_input(self, prompt: str) -> int:
+    def __takeInput(self, prompt: str, valid_nums: list[int]) -> int:
         """ To take valid from user """
         while True:
             try:
-                coor: int = int(input(prompt))
-                if 0 <= coor <= 8:
+                num: int = int(input(prompt))
+                if num in valid_nums:
                     break
                 else:
                     print('Invalid Input!')
             except Exception:
                 print('Invalid Input!')
 
-        return coor
+        return num
 
     def play(self) -> None:
         """ To play the game """
@@ -285,28 +284,29 @@ class Game:
 
         # Game Loop
         while not self.__game_over:
-            # Clear the screen
-            clear_console()
 
             # Show board
             self.__board.display()
 
             # Get location
             print(self.__players[self.__turn].name + '\'s Turn:')
-            i: int = self.__take_input('Enter location for row>> ')
-            j: int = self.__take_input('Enter location for column>> ')
-            c: int = self.__take_input('Even: S, Odd: O (Single Digit)>> ')
-            board.place(i, j, s[c % 2])
+            i: int = self.__takeInput('Enter location for row>> ', [n for n in range(9)])
+            j: int = self.__takeInput('Enter location for column>> ', [n for n in range(9)])
+            c: int = self.__takeInput('1: S, 2: O (Single Digit)>> ', [1, 2])
+            board.place(i, j, s[c - 1])
+
+            # Clear the screen
+            clear_console()
 
             # Find Winner
-            self.__checkCombination(i, j, s[c % 2])
+            self.__checkCombination(i, j, s[c - 1])
 
             # Update
             self.__update()
 
         # Display Score of all players and the board
         self.__board.display()
-        self.__players_info()
+        self.__displayResult()
 
         # Hold the screen
         a = input('\nPress \'Enter\' to exit...')
