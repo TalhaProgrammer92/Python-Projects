@@ -121,6 +121,12 @@ class DataBase:
         self.cursor = self.database.cursor()
         self.__pre_process()
 
+    def insert_data(self, table_name: str, data: tuple) -> None:
+        """ Insert data in table """
+        self.cursor.execute(f"""
+        INSERT INTO {table_name} VALUES {data}
+        """)
+
     def __pre_process(self) -> None:
         """ Create important tables """
         try:
