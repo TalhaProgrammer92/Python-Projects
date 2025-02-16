@@ -28,8 +28,8 @@ class Item:
         self.sell_date: str | None = None
 
     @property
-    def data(self) -> tuple:
-        return (
+    def data(self) -> list:
+        return [
             self.id,
             self.type,
             self.company,
@@ -37,11 +37,11 @@ class Item:
             self.details,
             self.customer_id if self.customer_id is not None else 'None',
             self.sell_date if self.sell_date is not None else 'None'
-        )
+        ]
 
-    @property
-    def header(self) -> tuple:
-        return (
+    @staticmethod
+    def header() -> list:
+        return [
             'id',
             'type',
             'company',
@@ -49,7 +49,7 @@ class Item:
             'details',
             'customer_id',
             'sell_date'
-        )
+        ]
 
     def sell(self, customer) -> None:
         """ Sell the item to a customer """
@@ -64,8 +64,8 @@ class Item:
         repr_: str = ''
 
         # Adding data
-        for i in range(len(self.header)):
-            repr_ += self.header[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
+        for i in range(len(self.header())):
+            repr_ += self.header()[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
 
         return repr_
 
@@ -82,32 +82,32 @@ class Customer:
         self.purchase_date: str | None = None
 
     @property
-    def data(self) -> tuple:
-        return (
+    def data(self) -> list:
+        return [
             self.id,
             self.name,
             self.contact,
             self.item_id if self.item_id is not None else 'None',
             self.purchase_date if self.purchase_date is not None else 'None'
-        )
+        ]
 
-    @property
-    def header(self) -> tuple:
-        return (
+    @staticmethod
+    def header() -> list:
+        return [
             'id',
             'name',
             'contact',
             'item_id',
             'purchase_date'
-        )
+        ]
 
     def __repr__(self) -> str:
         """ To represent the object as string """
         repr_: str = ''
 
         # Adding data
-        for i in range(len(self.header)):
-            repr_ += self.header[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
+        for i in range(len(self.header())):
+            repr_ += self.header()[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
 
         return repr_
 
@@ -121,16 +121,23 @@ class DataBase:
         self.cursor = self.database.cursor()
         self.__pre_process()
 
-    def insert_data(self, table_name: str, data: tuple) -> None:
+    def insert(self, table_name: str, data: list) -> None:
         """ Insert data in table """
-        self.cursor.execute(f"""
-        INSERT INTO {table_name} VALUES {data}
-        """)
+        command: str = f"INSERT INTO {table_name} VALUES ("
+
+        for i in len(data):
+            command += str(data[i])
+            if i < len(data) - 1:
+                command += ','
+        command += ')'
+
+        self.cursor.execute(command)
+        self.database.commit()
 
     def __pre_process(self) -> None:
         """ Create important tables """
         try:
-            item_header: tuple = Item().header
+            item_header: tuple = Item.header()
             '''
                     'id',
                     'type',
@@ -140,7 +147,7 @@ class DataBase:
                     'customer_id',
                     'sell_date'
             '''
-            customer_header: tuple = Customer().header
+            customer_header: tuple = Customer.header()
             '''
                     'id',
                     'name',
@@ -150,7 +157,7 @@ class DataBase:
             '''
 
             # Tables Creation
-            self.cursor.execute(f"""
+            command: str = f"""
             CREATE TABLE items (
                     -- Header
                     {item_header[0]} INTEGER PRIMARY KEY,
@@ -170,8 +177,12 @@ class DataBase:
                     {item_header[3]} INTEGER,
                     {item_header[4]} TEXT,
             )
-            """)
-        except Exception as e:
+            """
+            self.cursor.execute(command)
+
+            # Commit changes
+            self.database.commit()
+        except sq.OperationalError as e:
             print(f'Tables already created\n')
 
 
@@ -179,6 +190,8 @@ class DataBase:
 # Testing
 ##################
 if __name__ == '__main__':
+    database: DataBase = DataBase()
+
     item: Item = Item(1, 'Laptop', 'Lenovo', 25000, 'i5 4th Generation')
 
     customer: Customer = Customer(3, 'Talha Ahmad', '+92 331 4650460')
@@ -186,3 +199,5 @@ if __name__ == '__main__':
     item.sell(customer)
 
     print(item, customer, sep='\n')
+
+    database.insert('items', item.data)
