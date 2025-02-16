@@ -128,6 +128,20 @@ class DataBase:
         self.cursor.execute(command)
         self.database.commit()
 
+    def retrieve(self, table: str, elements: str, condition: str = '') -> list:
+        """ Retrieve data from table """
+        # Query
+        query: str = f'SELECT {elements} FROM {table}'
+        if len(condition) > 0:
+            query += f' WHERE {condition}'
+
+        # Execute query
+        data: list = list(self.cursor.execute(query))
+        self.database.commit()
+
+        # Return data
+        return data
+
     def __pre_process(self) -> None:
         """ Create important tables """
         try:
@@ -153,11 +167,11 @@ class DataBase:
             # Customers Table
             self.cursor.execute(f"""CREATE TABLE customers (
                     -- Header
-                    {item_header[0]} INTEGER PRIMARY KEY,
-                    {item_header[1]} TEXT,
-                    {item_header[2]} TEXT,
-                    {item_header[3]} INTEGER,
-                    {item_header[4]} TEXT
+                    {customer_header[0]} INTEGER PRIMARY KEY,
+                    {customer_header[1]} TEXT,
+                    {customer_header[2]} TEXT,
+                    {customer_header[3]} INTEGER,
+                    {customer_header[4]} TEXT
                 )"""
             )
 
@@ -181,5 +195,10 @@ if __name__ == '__main__':
 
     print(item, customer, sep='\n')
 
-    database.insert('items', item.data)
-    database.insert('customers', customer.data)
+    # database.insert('items', item.data)
+    # database.insert('customers', customer.data)
+
+    print(database.retrieve(
+        'items',
+        '*'
+    ))
