@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
-from os.path import exists
+from os.path import exists, join
 from os import mkdir
 from datetime import datetime
 
@@ -35,7 +35,8 @@ class Item:
             self.company,
             self.price,
             self.details,
-            self.customer_id if self.customer_id is not None else 'None'
+            self.customer_id if self.customer_id is not None else 'None',
+            self.sell_date if self.sell_date is not None else 'None'
         )
 
     @property
@@ -46,14 +47,17 @@ class Item:
             'company',
             'price',
             'details',
-            'customer_id'
+            'customer_id',
+            'sell_date'
         )
 
     def sell(self, customer) -> None:
         """ Sell the item to a customer """
         self.sell_date = get_current_datetime()
         self.customer_id = customer.id
+
         customer.item_id = self.id
+        customer.purchase_date = self.sell_date
 
     def __repr__(self) -> str:
         """ To represent the object as string """
@@ -75,6 +79,7 @@ class Customer:
         self.name = name
         self.contact = contact
         self.item_id: int | None = None
+        self.purchase_date: str | None = None
 
     @property
     def data(self) -> tuple:
@@ -82,7 +87,8 @@ class Customer:
             self.id,
             self.name,
             self.contact,
-            self.item_id if self.item_id is not None else 'None'
+            self.item_id if self.item_id is not None else 'None',
+            self.purchase_date if self.purchase_date is not None else 'None'
         )
 
     @property
@@ -91,7 +97,8 @@ class Customer:
             'id',
             'name',
             'contact',
-            'item_id'
+            'item_id',
+            'purchase_date'
         )
 
     def __repr__(self) -> str:
@@ -106,6 +113,63 @@ class Customer:
 
 
 ##################
+# DBMS
+##################
+class DataBase:
+    def __init__(self):
+        self.database = sq.connect('data.db')
+        self.cursor = self.database.cursor()
+        self.__pre_process()
+
+    def __pre_process(self) -> None:
+        """ Create important tables """
+        try:
+            item_header: tuple = Item().header
+            '''
+                    'id',
+                    'type',
+                    'company',
+                    'price',
+                    'details',
+                    'customer_id',
+                    'sell_date'
+            '''
+            customer_header: tuple = Customer().header
+            '''
+                    'id',
+                    'name',
+                    'contact',
+                    'item_id',
+                    'purchase_date'
+            '''
+
+            # Tables Creation
+            self.cursor.execute(f"""
+            CREATE TABLE items (
+                    -- Header
+                    {item_header[0]} INTEGER PRIMARY KEY,
+                    {item_header[1]} TEXT,
+                    {item_header[2]} TEXT,
+                    {item_header[3]} INTEGER,
+                    {item_header[4]} TEXT,
+                    {item_header[5]} INTEGER,
+                    {item_header[6]} TEXT
+            )
+
+            CREATE TABLE customer (
+                    -- Header
+                    {item_header[0]} INTEGER PRIMARY KEY,
+                    {item_header[1]} TEXT,
+                    {item_header[2]} TEXT,
+                    {item_header[3]} INTEGER,
+                    {item_header[4]} TEXT,
+            )
+            """)
+        except Exception as e:
+            print(f'Tables already created\n')
+
+
+##################
 # Testing
 ##################
 if __name__ == '__main__':
@@ -115,4 +179,4 @@ if __name__ == '__main__':
 
     item.sell(customer)
 
-    print(item, customer, f'Sold at {item.sell_date}', sep='\n')
+    print(item, customer, sep='\n')
