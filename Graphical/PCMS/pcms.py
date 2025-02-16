@@ -123,13 +123,7 @@ class DataBase:
 
     def insert(self, table_name: str, data: list) -> None:
         """ Insert data in table """
-        command: str = f"INSERT INTO {table_name} VALUES ("
-
-        for i in len(data):
-            command += str(data[i])
-            if i < len(data) - 1:
-                command += ','
-        command += ')'
+        command: str = f"INSERT INTO {table_name} VALUES {str(tuple(data))}"
 
         self.cursor.execute(command)
         self.database.commit()
@@ -137,28 +131,11 @@ class DataBase:
     def __pre_process(self) -> None:
         """ Create important tables """
         try:
-            item_header: tuple = Item.header()
-            '''
-                    'id',
-                    'type',
-                    'company',
-                    'price',
-                    'details',
-                    'customer_id',
-                    'sell_date'
-            '''
-            customer_header: tuple = Customer.header()
-            '''
-                    'id',
-                    'name',
-                    'contact',
-                    'item_id',
-                    'purchase_date'
-            '''
+            item_header: list = Item.header()
+            customer_header: list = Customer.header()
 
-            # Tables Creation
-            command: str = f"""
-            CREATE TABLE items (
+            # Items Table
+            self.cursor.execute(f"""CREATE TABLE items (
                     -- Header
                     {item_header[0]} INTEGER PRIMARY KEY,
                     {item_header[1]} TEXT,
@@ -167,23 +144,27 @@ class DataBase:
                     {item_header[4]} TEXT,
                     {item_header[5]} INTEGER,
                     {item_header[6]} TEXT
+                )"""
             )
 
-            CREATE TABLE customer (
+            # Commit changes
+            self.database.commit()
+
+            # Customers Table
+            self.cursor.execute(f"""CREATE TABLE customers (
                     -- Header
                     {item_header[0]} INTEGER PRIMARY KEY,
                     {item_header[1]} TEXT,
                     {item_header[2]} TEXT,
                     {item_header[3]} INTEGER,
-                    {item_header[4]} TEXT,
+                    {item_header[4]} TEXT
+                )"""
             )
-            """
-            self.cursor.execute(command)
 
             # Commit changes
             self.database.commit()
         except sq.OperationalError as e:
-            print(f'Tables already created\n')
+            pass
 
 
 ##################
@@ -201,3 +182,4 @@ if __name__ == '__main__':
     print(item, customer, sep='\n')
 
     database.insert('items', item.data)
+    database.insert('customers', customer.data)
