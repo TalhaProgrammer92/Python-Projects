@@ -135,12 +135,45 @@ class DataBase:
         if len(condition) > 0:
             query += f' WHERE {condition}'
 
-        # Execute query
+        # Execute & commit query
         data: list = list(self.cursor.execute(query))
         self.database.commit()
 
         # Return data
         return data
+
+    def remove(self, table: str, condition: str = '') -> None:
+        """ Remove data from table """
+        # Query
+        query: str = f'DELETE FROM {table}'
+
+        # Condition
+        if len(condition) > 0:
+            query += f' WHERE {condition}'
+
+        # Execute & commit query
+        self.cursor.execute(query)
+        self.database.commit()
+
+    def update(self, table: str, elements: list[str], values: list, condition: str = ''):
+        """ Update data of table """
+        # Query
+        query: str = f'UPDATE {table} SET '
+
+        # Adding values to set
+        for i in range(len(elements)):
+            query += f'{elements[i]} = \'{values[i]}\'' if isinstance(values[i], str) else f'{elements[i]} = {values[i]}'
+            if i < len(elements) - 1:
+                query += ','
+            query += ' '
+
+        # Condition
+        if len(condition) > 0:
+            query += f'WHERE {condition};'
+
+        # Execute & commit query
+        self.cursor.execute(query)
+        self.database.commit()
 
     def __pre_process(self) -> None:
         """ Create important tables """
@@ -193,12 +226,21 @@ if __name__ == '__main__':
 
     item.sell(customer)
 
-    print(item, customer, sep='\n')
+    # print(item, customer, sep='\n')
 
     # database.insert('items', item.data)
     # database.insert('customers', customer.data)
 
-    print(database.retrieve(
+    # data = database.retrieve('items', '*')
+    # print(data)
+
+    # database.remove('items')
+
+    '''
+    database.update(
         'items',
-        '*'
-    ))
+        ['price', 'details'],
+        [45000, 'i5 6th Generation'],
+        'id = 1'
+    )
+    '''
