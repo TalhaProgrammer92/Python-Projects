@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
-from os.path import exists, join
+from os.path import join
 from os import mkdir
 from datetime import datetime
 
@@ -215,16 +215,46 @@ class DataBase:
 
 
 ##################
+# Main Window
+##################
+class MainWindow(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        # Properties
+        self.width = 1280
+        self.height = 720
+        self.geometry(f'{self.width}x{self.height}')
+        self.title('PCMS')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+        self.__appearance()
+
+    def __appearance(self) -> None:
+        """ Set appearance """
+        # Heading
+        tk.Label(self, text='Punjab Computer Management Software', fg='white', bg='green', font=('calisto mt', 25, 'bold')).pack(fill='x')
+
+        # Button Frame
+        bt_frame = tk.Frame(self, bg='cyan')
+
+        pass
+
+        bt_frame.pack()
+
+
+
+##################
 # Testing
 ##################
 if __name__ == '__main__':
-    database: DataBase = DataBase()
-
-    item: Item = Item(1, 'Laptop', 'Lenovo', 25000, 'i5 4th Generation')
-
-    customer: Customer = Customer(3, 'Talha Ahmad', '+92 331 4650460')
-
-    item.sell(customer)
+    # database: DataBase = DataBase()
+    #
+    # item: Item = Item(1, 'Laptop', 'Lenovo', 25000, 'i5 4th Generation')
+    #
+    # customer: Customer = Customer(3, 'Talha Ahmad', '+92 331 4650460')
+    #
+    # item.sell(customer)
 
     # print(item, customer, sep='\n')
 
@@ -244,3 +274,6 @@ if __name__ == '__main__':
         'id = 1'
     )
     '''
+
+    win = MainWindow()
+    win.mainloop()
