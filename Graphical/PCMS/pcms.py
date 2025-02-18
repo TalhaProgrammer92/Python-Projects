@@ -200,6 +200,7 @@ class TreeviewWindow(tk.Tk):
     def treeview(self) -> None:
         """ A Treeview to display records in database """
         # Items
+        tk.Label(self.__frame_items, text='Items', font=('calibri', 15, 'bold'), fg='blue').pack()
         self.__scroll_items.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Item.header():
             self.__tree_items.heading(head, text=head)
@@ -208,6 +209,7 @@ class TreeviewWindow(tk.Tk):
         self.__scroll_items.config(command=self.__tree_items.yview())
 
         # Customers
+        tk.Label(self.__frame_customers, text='Customers', font=('calibri', 15, 'bold'), fg='blue').pack()
         self.__scroll_customers.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Customer.header():
             self.__tree_customers.heading(head, text=head)
