@@ -7,6 +7,13 @@ from os import mkdir
 from datetime import datetime
 
 
+########################
+# Database - Global
+########################
+database = sq.connect('data.db')
+cursor = database.cursor()
+
+
 ##################
 # Functions
 ##################
@@ -19,8 +26,7 @@ def get_current_datetime():
 # Item
 ##################
 class Item:
-    def __init__(self, id: int, type: str, company: str, price: int, details: str = ''):
-        self.id = id
+    def __init__(self, type: str, company: str, price: int, details: str = ''):
         self.type = type
         self.company = company
         self.price = price
@@ -28,33 +34,25 @@ class Item:
         self.sell_date: str | None = None
 
     @property
-    def data(self) -> list:
-        return [
-            self.id,
+    def data(self) -> tuple:
+        return (
             self.type,
             self.company,
             self.price,
             self.details,
             self.sell_date if self.sell_date is not None else 'None'
-        ]
+        )
 
     @staticmethod
-    def header() -> list:
-        return [
+    def header() -> tuple:
+        return (
             'id',
             'type',
             'company',
             'price',
             'detail',
             'sell_date'
-        ]
-
-    def sell(self, customer) -> None:
-        """ Sell the item to a customer """
-        self.sell_date = get_current_datetime()
-
-        customer.item_id = self.id
-        customer.purchase_date = self.sell_date
+        )
 
     def __repr__(self) -> str:
         """ To represent the object as string """
@@ -62,7 +60,7 @@ class Item:
 
         # Adding data
         for i in range(len(self.header())):
-            repr_ += self.header()[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
+            repr_ += f'{self.header()[i]} {'-' * 5} {self.data[i]}\n'
 
         return repr_
 
@@ -71,32 +69,30 @@ class Item:
 # Customer
 ##################
 class Customer:
-    def __init__(self, id: int, name: str, contact: str):
-        self.id = id
+    def __init__(self, name: str, contact: str, item_id):
         self.name = name
         self.contact = contact
-        self.item_id: int | None = None
-        self.purchase_date: str | None = None
+        self.item_id: int = item_id
+        self.purchase_date: str = get_current_datetime()
 
     @property
-    def data(self) -> list:
-        return [
-            self.id,
+    def data(self) -> tuple:
+        return (
             self.name,
             self.contact,
-            self.item_id if self.item_id is not None else 'None',
+            self.item_id if self.item_id is not None else 0,
             self.purchase_date if self.purchase_date is not None else 'None'
-        ]
+        )
 
     @staticmethod
-    def header() -> list:
-        return [
+    def header() -> tuple:
+        return (
             'id',
             'name',
             'contact',
             'item_id',
             'purchase_date'
-        ]
+        )
 
     def __repr__(self) -> str:
         """ To represent the object as string """
@@ -104,10 +100,56 @@ class Customer:
 
         # Adding data
         for i in range(len(self.header())):
-            repr_ += self.header()[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
+            repr_ += f'{self.header()[i]} {'-' * 5} {self.data[i]}\n'
 
         return repr_
 
+
+#######################
+# Database Functions
+#######################
+def create_tables():
+    """ Create tables if don't exist """
+    item_header: list = Item.header()
+    customer_header: list = Customer.header()
+
+    # Items Table
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS items (
+            -- Header
+            {item_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
+            {item_header[1]} TEXT NOT NULL,
+            {item_header[2]} TEXT NOT NULL,
+            {item_header[3]} REAL NOT NULL,
+            {item_header[4]} TEXT,
+            {item_header[5]} TEXT
+        )"""
+    )
+
+    # Commit changes
+    database.commit()
+
+    # Customers Table
+    cursor.execute(f"""CREATE TABLE IF NOT EXISTS customers (
+            -- Header
+            {customer_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
+            {customer_header[1]} TEXT NOT NULL,
+            {customer_header[2]} TEXT NOT NULL,
+            {customer_header[3]} INTEGER,  -- Define item_id first
+            {customer_header[4]} TEXT,
+            FOREIGN KEY ({customer_header[3]}) REFERENCES items(id) ON DELETE SET NULL  -- Define Foreign key
+        )"""
+    )
+
+    # Commit changes
+    database.commit()
+
+def insert(table: str, names: tuple, values: tuple):
+    """ To insert data in a table """
+    cursor.execute(f'INSERT INTO {table} {names} VALUES {values}')
+    database.commit()
+
+# Call the function
+create_tables()
 
 ##################
 # Inventory
@@ -115,111 +157,6 @@ class Customer:
 class Inventory:
     def __init__(self):
         self.items: list[Item] = []
-
-
-##################
-# DBMS
-##################
-class DataBase:
-    def __init__(self):
-        self.database = sq.connect('data.db')
-        self.cursor = self.database.cursor()
-        self.__pre_process()
-
-    def insert(self, table_name: str, data: list) -> None:
-        """ Insert data in table """
-        command: str = f"INSERT INTO {table_name} VALUES {str(tuple(data))}"
-
-        self.cursor.execute(command)
-        self.database.commit()
-
-    def retrieve(self, table: str, elements: str, condition: str = '') -> list:
-        """ Retrieve data from table """
-        # Query
-        query: str = f'SELECT {elements} FROM {table}'
-        if len(condition) > 0:
-            query += f' WHERE {condition}'
-
-        # Execute & commit query
-        data: list = list(self.cursor.execute(query))
-        self.database.commit()
-
-        # Return data
-        return data
-
-    def remove(self, table: str, condition: str = '') -> None:
-        """ Remove data from table """
-        # Query
-        query: str = f'DELETE FROM {table}'
-
-        # Condition
-        if len(condition) > 0:
-            query += f' WHERE {condition}'
-
-        # Execute & commit query
-        self.cursor.execute(query)
-        self.database.commit()
-
-    def update(self, table: str, elements: list[str], values: list, condition: str = ''):
-        """ Update data of table """
-        # Query
-        query: str = f'UPDATE {table} SET '
-
-        # Adding values to set
-        for i in range(len(elements)):
-            query += f'{elements[i]} = \'{values[i]}\'' if isinstance(values[i], str) else f'{elements[i]} = {values[i]}'
-            if i < len(elements) - 1:
-                query += ','
-            query += ' '
-
-        # Condition
-        if len(condition) > 0:
-            query += f'WHERE {condition};'
-
-        # Execute & commit query
-        self.cursor.execute(query)
-        self.database.commit()
-
-    def __pre_process(self) -> None:
-        """ Create important tables """
-        item_header: list = Item.header()
-        customer_header: list = Customer.header()
-
-        # Items Table
-        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS items (
-                -- Header
-                {item_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
-                {item_header[1]} TEXT NOT NULL,
-                {item_header[2]} TEXT NOT NULL,
-                {item_header[3]} REAL NOT NULL,
-                {item_header[4]} TEXT,
-                {item_header[5]} TEXT
-            )"""
-        )
-
-        # Commit changes
-        self.database.commit()
-
-        # Customers Table
-        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS customers (
-                -- Header
-                {customer_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
-                {customer_header[1]} TEXT NOT NULL,
-                {customer_header[2]} TEXT NOT NULL,
-                {customer_header[3]} INTEGER,  -- Define item_id first
-                {customer_header[4]} TEXT,
-                FOREIGN KEY ({customer_header[3]}) REFERENCES items(id) ON DELETE SET NULL  -- Define Foreign key
-            )"""
-        )
-
-        # Commit changes
-        self.database.commit()
-
-
-#############################
-# DBMS - Global Object
-#############################
-database: DataBase = DataBase()
 
 
 ######################
@@ -291,12 +228,12 @@ class TreeviewWindow(tk.Tk):
             self.__tree_customers.delete(row)
 
         # Fetch data
-        database.cursor.execute('SELECT * FROM items')
-        for row in database.cursor.fetchall():
+        cursor.execute('SELECT * FROM items')
+        for row in cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
 
-        database.cursor.execute('SELECT * FROM customers')
-        for row in database.cursor.fetchall():
+        cursor.execute('SELECT * FROM customers')
+        for row in cursor.fetchall():
             self.__tree_customers.insert('', 'end', values=row)
 
 
@@ -304,32 +241,13 @@ class TreeviewWindow(tk.Tk):
 # Testing
 ##################
 if __name__ == '__main__':
-    # database: DataBase = DataBase()
-    #
-    # item: Item = Item(1, 'Laptop', 'Lenovo', 25000, 'i5 4th Generation')
-    #
-    # customer: Customer = Customer(3, 'Talha Ahmad', '+92 331 4650460')
-    #
-    # item.sell(customer)
+    item: Item = Item('Laptop', 'Lenovo', 25000, 'i5 4th Generation')
+    customer: Customer = Customer('Talha Ahmad', '+92 331 4650460', 1)
+    item.sell_date = customer.purchase_date
 
-    # print(item, customer, sep='\n')
-
-    # database.insert('items', item.data)
-    # database.insert('customers', customer.data)
-
-    # data = database.retrieve('items', '*')
-    # print(data)
-
-    # database.remove('items')
-
-    '''
-    database.update(
-        'items',
-        ['price', 'details'],
-        [45000, 'i5 6th Generation'],
-        'id = 1'
-    )
-    '''
+    # Insert data
+    insert('items', Item.header()[1:], item.data)
+    insert('customers', Customer.header()[1:], customer.data)
 
     win = TreeviewWindow()
     win.mainloop()
