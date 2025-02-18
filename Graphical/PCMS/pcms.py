@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
+from tkinter import ttk
 from os.path import join
 from os import mkdir
 from datetime import datetime
@@ -185,41 +186,38 @@ class DataBase:
 
     def __pre_process(self) -> None:
         """ Create important tables """
-        try:
-            item_header: list = Item.header()
-            customer_header: list = Customer.header()
+        item_header: list = Item.header()
+        customer_header: list = Customer.header()
 
-            # Items Table
-            self.cursor.execute(f"""CREATE TABLE items (
-                    -- Header
-                    {item_header[0]} INTEGER PRIMARY KEY,
-                    {item_header[1]} TEXT,
-                    {item_header[2]} TEXT,
-                    {item_header[3]} INTEGER,
-                    {item_header[4]} TEXT,
-                    {item_header[5]} INTEGER,
-                    {item_header[6]} TEXT
-                )"""
-            )
+        # Items Table
+        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS items (
+                -- Header
+                {item_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
+                {item_header[1]} TEXT NOT NULL,
+                {item_header[2]} TEXT NOT NULL,
+                {item_header[3]} REAL NOT NULL,
+                {item_header[4]} TEXT,
+                {item_header[5]} INTEGER,
+                {item_header[6]} TEXT
+            )"""
+        )
 
-            # Commit changes
-            self.database.commit()
+        # Commit changes
+        self.database.commit()
 
-            # Customers Table
-            self.cursor.execute(f"""CREATE TABLE customers (
-                    -- Header
-                    {customer_header[0]} INTEGER PRIMARY KEY,
-                    {customer_header[1]} TEXT,
-                    {customer_header[2]} TEXT,
-                    {customer_header[3]} INTEGER,
-                    {customer_header[4]} TEXT
-                )"""
-            )
+        # Customers Table
+        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS customers (
+                -- Header
+                {customer_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
+                {customer_header[1]} TEXT NOT NULL,
+                {customer_header[2]} TEXT NOT NULL,
+                FOREIGN KEY ({customer_header[3]}) REFERENCES items(id) ON DELETE SET NULL,
+                {customer_header[4]} TEXT
+            )"""
+        )
 
-            # Commit changes
-            self.database.commit()
-        except sq.OperationalError as e:
-            pass
+        # Commit changes
+        self.database.commit()
 
 
 #############################
@@ -242,6 +240,19 @@ class MainWindow(tk.Tk):
         self.title('PCMS')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
+
+        # Some Frames
+        self.__frame_items = tk.Frame(self, padx=10, pady=10)
+        self.__frame_items.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.__frame_customers = tk.Frame(self, padx=10, pady=10)
+        self.__frame_customers.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Tree-views
+        self.__tree_items = ttk.Treeview(self.__frame_items, columns=tuple(Item.header()), show='headings')
+        self.__tree_customers = ttk.Treeview(self.__frame_customers, columns=tuple(Customer.header()), show='headings')
+
+        # Set the appearance
         self.__appearance()
 
     def __appearance(self) -> None:
@@ -249,13 +260,41 @@ class MainWindow(tk.Tk):
         # Heading
         tk.Label(self, text='Punjab Computer Management Software', fg='white', bg='green', font=('calisto mt', 25, 'bold')).pack(fill='x')
 
-        # Button Frame
-        bt_frame = tk.Frame(self, bg='cyan')
+        # Tree-view
+        self.treeview()
 
-        pass
+    def treeview(self) -> None:
+        """ A Treeview to display records in database """
+        # Items
+        for head in Item.header():
+            self.__tree_items.heading(head, text=head)
+        self.__tree_items.pack(fill=tk.BOTH, expand=True)
 
-        bt_frame.pack()
+        # Customers
+        for head in Customer.header():
+            self.__tree_customers.heading(head, text=head)
+        self.__tree_customers.pack(fill=tk.BOTH, expand=True)
 
+        # Load Tree-view
+        self.load_treeview_data()
+
+    def load_treeview_data(self) -> None:
+        """ To load data in tree-views """
+        # Clear tree-views
+        for row in self.__tree_items.get_children():
+            self.__tree_items.delete(row)
+
+        for row in self.__tree_customers.get_children():
+            self.__tree_customers.delete(row)
+
+        # Fetch
+        database.cursor.execute('SELECT * FROM items')
+        for row in database.cursor.fetchall():
+            self.__tree_items.insert('', 'end', values=row)
+
+        database.cursor.execute('SELECT * FROM customers')
+        for row in database.cursor.fetchall():
+            self.__tree_customers.insert('', 'end', values=row)
 
 
 ##################
