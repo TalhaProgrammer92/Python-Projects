@@ -25,7 +25,6 @@ class Item:
         self.company = company
         self.price = price
         self.details = details
-        self.customer_id: int | None = None
         self.sell_date: str | None = None
 
     @property
@@ -36,7 +35,6 @@ class Item:
             self.company,
             self.price,
             self.details,
-            self.customer_id if self.customer_id is not None else 'None',
             self.sell_date if self.sell_date is not None else 'None'
         ]
 
@@ -48,14 +46,12 @@ class Item:
             'company',
             'price',
             'detail',
-            'customer_id',
             'sell_date'
         ]
 
     def sell(self, customer) -> None:
         """ Sell the item to a customer """
         self.sell_date = get_current_datetime()
-        self.customer_id = customer.id
 
         customer.item_id = self.id
         customer.purchase_date = self.sell_date
@@ -197,8 +193,7 @@ class DataBase:
                 {item_header[2]} TEXT NOT NULL,
                 {item_header[3]} REAL NOT NULL,
                 {item_header[4]} TEXT,
-                {item_header[5]} INTEGER,
-                {item_header[6]} TEXT
+                {item_header[5]} TEXT
             )"""
         )
 
@@ -211,8 +206,9 @@ class DataBase:
                 {customer_header[0]} INTEGER PRIMARY KEY AUTOINCREMENT,
                 {customer_header[1]} TEXT NOT NULL,
                 {customer_header[2]} TEXT NOT NULL,
-                FOREIGN KEY ({customer_header[3]}) REFERENCES items(id) ON DELETE SET NULL,
-                {customer_header[4]} TEXT
+                {customer_header[3]} INTEGER,  -- Define item_id first
+                {customer_header[4]} TEXT,
+                FOREIGN KEY ({customer_header[3]}) REFERENCES items(id) ON DELETE SET NULL  -- Define Foreign key
             )"""
         )
 
@@ -226,10 +222,10 @@ class DataBase:
 database: DataBase = DataBase()
 
 
-##################
-# Main Window
-##################
-class MainWindow(tk.Tk):
+######################
+# Treeview Window
+######################
+class TreeviewWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
@@ -237,7 +233,7 @@ class MainWindow(tk.Tk):
         self.width = 1280
         self.height = 720
         self.geometry(f'{self.width}x{self.height}')
-        self.title('PCMS')
+        self.title('Data View')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
 
@@ -252,28 +248,35 @@ class MainWindow(tk.Tk):
         self.__tree_items = ttk.Treeview(self.__frame_items, columns=tuple(Item.header()), show='headings')
         self.__tree_customers = ttk.Treeview(self.__frame_customers, columns=tuple(Customer.header()), show='headings')
 
+        # Scroll-bars
+        self.__scroll_items = ttk.Scrollbar(self.__frame_items, orient=tk.VERTICAL)
+        self.__scroll_customers = ttk.Scrollbar(self.__frame_customers, orient=tk.VERTICAL)
+
         # Set the appearance
         self.__appearance()
 
     def __appearance(self) -> None:
         """ Set appearance """
-        # Heading
-        tk.Label(self, text='Punjab Computer Management Software', fg='white', bg='green', font=('calisto mt', 25, 'bold')).pack(fill='x')
-
         # Tree-view
         self.treeview()
 
     def treeview(self) -> None:
         """ A Treeview to display records in database """
         # Items
+        self.__scroll_items.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Item.header():
             self.__tree_items.heading(head, text=head)
+            self.__tree_items.column(head, width=50)
         self.__tree_items.pack(fill=tk.BOTH, expand=True)
+        self.__scroll_items.config(command=self.__tree_items.yview())
 
         # Customers
+        self.__scroll_customers.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Customer.header():
             self.__tree_customers.heading(head, text=head)
+            self.__tree_customers.column(head, width=25)
         self.__tree_customers.pack(fill=tk.BOTH, expand=True)
+        self.__scroll_customers.config(command=self.__tree_customers.yview())
 
         # Load Tree-view
         self.load_treeview_data()
@@ -287,7 +290,7 @@ class MainWindow(tk.Tk):
         for row in self.__tree_customers.get_children():
             self.__tree_customers.delete(row)
 
-        # Fetch
+        # Fetch data
         database.cursor.execute('SELECT * FROM items')
         for row in database.cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
@@ -328,5 +331,7 @@ if __name__ == '__main__':
     )
     '''
 
-    win = MainWindow()
+    win = TreeviewWindow()
     win.mainloop()
+
+    pass
