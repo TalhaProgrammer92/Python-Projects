@@ -46,7 +46,7 @@ class Item:
             'type',
             'company',
             'price',
-            'details',
+            'detail',
             'customer_id',
             'sell_date'
         ]
@@ -110,6 +110,14 @@ class Customer:
             repr_ += self.header()[i].capitalize() + f' {'-' * 5} ' + str(self.data[i]) + '\n'
 
         return repr_
+
+
+##################
+# Inventory
+##################
+class Inventory:
+    def __init__(self):
+        self.items: list[Item] = []
 
 
 ##################
@@ -212,6 +220,12 @@ class DataBase:
             self.database.commit()
         except sq.OperationalError as e:
             pass
+
+
+#############################
+# DBMS - Global Object
+#############################
+database: DataBase = DataBase()
 
 
 ##################
