@@ -59,6 +59,15 @@ class Item:
             'sell_date'
         )
 
+    @staticmethod
+    def tk_textvariables() -> tuple:
+        return (
+            tk.StringVar,
+            tk.StringVar,
+            tk.IntVar,
+            tk.StringVar
+        )
+
     def __repr__(self) -> str:
         """ To represent the object as string """
         repr_: str = ''
@@ -172,6 +181,45 @@ def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: b
 
 # Call the function
 create_tables()
+
+
+######################
+# Add Window
+######################
+class InsertWizard(tk.Tk):
+    def __init__(self, title: str, options: tuple[str], values: tuple[tk.StringVar | tk.IntVar]):
+        super().__init__()
+
+        # Properties
+        self.title(f'{title} Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 280
+        self.height = 150
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Attributes
+        self.options = options
+        self.entry_values = values
+
+        # Function call
+        self.__appearance()
+
+    def insert_data(self):
+        tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+
+    def __appearance(self) -> None:
+        # Entries
+        for i in range(len(self.options)):
+            # Label
+            tk.Label(self, text=self.options[i].capitalize(), font='arial 12', fg='blue').grid(row=i, column=0)
+
+            # Entry
+            tk.Entry(self, textvariable=self.entry_values[i](), font='calibri 12').grid(row=i, column=1)
+
+        # Button
+        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=i + 1, column=1)
 
 
 ######################
@@ -351,18 +399,22 @@ class TreeviewWindow(tk.Tk):
 # Testing
 ##################
 if __name__ == '__main__':
-    item: Item = Item('Laptop', 'Lenovo', 25000, 'i5 4th Generation')
-    customer: Customer = Customer('Talha Ahmad', '+92 331 4650460', 1)
-    item.sell_date = customer.purchase_date
+    # item: Item = Item('Laptop', 'Lenovo', 25000, 'i5 4th Generation')
+    # customer: Customer = Customer('Talha Ahmad', '+92 331 4650460', 1)
+    # item.sell_date = customer.purchase_date
 
     # Insert data
     # insert('items', Item.header()[1:], item.data)
     # insert('customers', Customer.header()[1:], customer.data)
 
-    win = TreeviewWindow()
-    win.mainloop()
+    # win = TreeviewWindow()
+    # win.mainloop()
 
-    # excel_win = ExcelWizard()
-    # excel_win.mainloop()
+    wizard = InsertWizard(
+        'Items',
+        Item.header()[1:-1],
+        Item.tk_textvariables()
+    )
+    wizard.mainloop()
 
     pass
