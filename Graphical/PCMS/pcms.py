@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
+import pandas as pd
 from tkinter import ttk
 from os.path import join
 from os import mkdir
@@ -169,11 +170,76 @@ def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: b
 create_tables()
 
 ##################
-# Inventory
+# Excel Wizard
 ##################
-class Inventory:
+class ExcelWizard(tk.Tk):
     def __init__(self):
-        self.items: list[Item] = []
+        super().__init__()
+
+        # Properties
+        self.title('Excel Wizard')
+        self.width = 350
+        self.height = 300
+        self.geometry(f'{self.width}x{self.height}')
+        self.maxsize(self.width, self.height)
+        self.minsize(self.width, self.height)
+        self.iconbitmap('icon.ico')
+
+        # Actions (Attributes)
+        self.__item_check = [[label, tk.IntVar()] for label in Item.header()[1:]]
+        self.__item_options = ['id']
+        self.__customer_check = [[label, tk.IntVar()] for label in Customer.header()[1:]]
+        self.__customer_options = ['id']
+
+        # Function Call
+        self.__set_appearance()
+
+    def __set_appearance(self) -> None:
+        """ Set appearance and behaviour """
+        # Label
+        tk.Label(self, text='Save records of your choice', font=('bahnschrift', 15, 'bold'), bg='orange', fg='blue').pack(fill='x')
+
+        # Methods Call
+        self.__selection_box()
+
+    def action_item(self) -> None:
+        """ Perform some action on user's selection for Item """
+        print('\n*** Item ***')
+        for attribute in self.__item_check:
+            if attribute[1].get() and attribute not in self.__item_options:
+                self.__item_options.append(attribute[0])
+            elif attribute[0] in self.__item_options:
+                self.__item_options.remove(attribute[0])
+            print(attribute[0], attribute[1].get())
+
+    def action_customer(self) -> None:
+        """ Perform some action on user's selection for Customer"""
+        print('\n*** Customer ***')
+        for attribute in self.__customer_check:
+            if attribute[1].get() and attribute[0] not in self.__customer_options:
+                self.__customer_options.append(attribute[0])
+            elif attribute[0] in self.__customer_options:
+                self.__customer_options.remove(attribute[0])
+            print(attribute[0], attribute[1].get())
+
+    def __selection_box(self) -> None:
+        """ Set all selection options for user to select which data he wants to store """
+        # Frames
+        item_frame = tk.Frame(self, padx=5, pady=5)
+        item_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        customer_frame = tk.Frame(self, padx=5, pady=5)
+        customer_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Adding Options - Item
+        tk.Label(item_frame, text='ITEM', bg='yellow', fg='green', font='arial 10 bold').pack(fill='x')
+        for label, check in self.__item_check:
+            tk.Checkbutton(item_frame, text=label.capitalize(), variable=check, command=self.action_item, pady=2).pack()
+
+        # Adding Options - Customer
+        tk.Label(customer_frame, text='CUSTOMER', bg='yellow', fg='green', font='arial 10 bold').pack(fill='x')
+        for label, check in self.__customer_check:
+            tk.Checkbutton(customer_frame, text=label.capitalize(), variable=check, command=self.action_customer, pady=2).pack()
 
 
 ######################
@@ -184,12 +250,10 @@ class TreeviewWindow(tk.Tk):
         super().__init__()
 
         # Properties
-        self.width = 1280
-        self.height = 720
-        self.geometry(f'{self.width}x{self.height}')
+        self.geometry('1280x720')
         self.title('Data View')
-        self.minsize(self.width, self.height)
-        self.maxsize(self.width, self.height)
+        self.minsize(800, 600)
+        # self.maxsize(self.width, self.height)
         self.iconbitmap('icon.ico')
 
         # Attributes to show
@@ -223,7 +287,9 @@ class TreeviewWindow(tk.Tk):
         self.treeview()
 
     def save_to_excel(self) -> None:
-        tmsg.showinfo('Info!', 'The file has been saved successfully')
+        """ To save current data in excel file to increase portability """
+        excel_win = ExcelWizard()
+        excel_win.mainloop()
 
     def add_item(self) -> None:
         tmsg.showinfo('Action', 'The item has been added successfully')
@@ -318,11 +384,11 @@ class TreeviewWindow(tk.Tk):
             self.__tree_customers.delete(row)
 
         # Fetch data
-        cursor.execute(f'SELECT {str(self.items_attributes)[1:-1]} FROM items')
+        cursor.execute(f'SELECT * FROM items')
         for row in cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
 
-        cursor.execute(f'SELECT {str(self.customers_attributes)[1:-1]} FROM customers')
+        cursor.execute(f'SELECT * FROM customers')
         for row in cursor.fetchall():
             self.__tree_customers.insert('', 'end', values=row)
 
@@ -339,10 +405,13 @@ if __name__ == '__main__':
     item.sell_date = customer.purchase_date
 
     # Insert data
-    insert('items', Item.header()[1:], item.data)
-    insert('customers', Customer.header()[1:], customer.data)
+    # insert('items', Item.header()[1:], item.data)
+    # insert('customers', Customer.header()[1:], customer.data)
 
-    win = TreeviewWindow()
-    win.mainloop()
+    # win = TreeviewWindow()
+    # win.mainloop()
+
+    excel_win = ExcelWizard()
+    excel_win.mainloop()
 
     pass
