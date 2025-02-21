@@ -148,6 +148,23 @@ def insert(table: str, names: tuple, values: tuple):
     cursor.execute(f'INSERT INTO {table} {names} VALUES {values}')
     database.commit()
 
+def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: bool = False) -> list:
+    """ To retrieve data from database """
+    # Query
+    query: str = f'SELECT {attributes} FROM {table}'
+
+    # Condition
+    if len(condition) > 0:
+        query += f' WHERE {condition}'
+
+    # Executing query
+    data: list = list(cursor.execute(query))
+    if commit:
+        database.commit()
+
+    # Return data retrieved
+    return data
+
 # Call the function
 create_tables()
 
@@ -173,6 +190,11 @@ class TreeviewWindow(tk.Tk):
         self.title('Data View')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
+        self.iconbitmap('icon.ico')
+
+        # Attributes to show
+        self.items_attributes = Item.header()
+        self.customers_attributes = Customer.header()
 
         # Some Frames
         self.__frame_items = tk.Frame(self, padx=10, pady=10)
@@ -194,13 +216,79 @@ class TreeviewWindow(tk.Tk):
 
     def __appearance(self) -> None:
         """ Set appearance """
+        # Menu bar
+        self.create_menus()
+
         # Tree-view
         self.treeview()
+
+    def save_to_excel(self) -> None:
+        tmsg.showinfo('Info!', 'The file has been saved successfully')
+
+    def add_item(self) -> None:
+        tmsg.showinfo('Action', 'The item has been added successfully')
+
+    def add_customer(self) -> None:
+        tmsg.showinfo('Action', 'The customer has been added successfully')
+
+    def update_items(self) -> None:
+        tmsg.showinfo('Action', 'The item has been updated successfully')
+
+    def update_customers(self) -> None:
+        tmsg.showinfo('Action', 'The customer has been updated successfully')
+
+    def remove_items(self) -> None:
+        tmsg.showinfo('Action', 'The item has been removed successfully')
+
+    def remove_customers(self) -> None:
+        tmsg.showinfo('Action', 'The customer has been removed successfully')
+
+    def filter_items(self) -> None:
+        tmsg.showinfo('Filter', 'The items data has been filtered successfully')
+
+    def filter_customers(self) -> None:
+        tmsg.showinfo('Filter', 'The customers data has been filtered successfully')
+
+    def create_menus(self) -> None:
+        """ To create menus and sub-menus """
+        # Main Bar
+        menu_bar = tk.Menu(self)
+
+        # File Menu
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        file_menu.add_command(label="Reload", command=self.load_treeview_data)
+        file_menu.add_command(label="Save to Excel", command=self.save_to_excel)
+        file_menu.add_separator()  # Add a separator line
+        file_menu.add_command(label="Exit", command=exit)
+
+        # Action Menu
+        action_menu = tk.Menu(menu_bar, tearoff=0)
+        action_menu.add_command(label="Add Item", command=self.add_item)
+        action_menu.add_command(label="Add Customer", command=self.add_customer)
+        action_menu.add_separator()
+        action_menu.add_command(label="Update Item(s)", command=self.update_items)
+        action_menu.add_command(label="Update Customer(s)", command=self.update_customers)
+        action_menu.add_separator()
+        action_menu.add_command(label="Remove Item(s)", command=self.remove_items)
+        action_menu.add_command(label="Remove Customer(s)", command=self.remove_customers)
+
+        # Filter Menu
+        filter_menu = tk.Menu(menu_bar, tearoff=0)
+        filter_menu.add_command(label="Filter Items Data", command=self.filter_items)
+        filter_menu.add_command(label="Filter Customers Data", command=self.filter_customers)
+
+        # Add Menus to Menu Bar
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        menu_bar.add_cascade(label="Action", menu=action_menu)
+        menu_bar.add_cascade(label='Filter', menu=filter_menu)
+
+        # Configure the window to use this menu bar
+        self.config(menu=menu_bar)
 
     def treeview(self) -> None:
         """ A Treeview to display records in database """
         # Items
-        tk.Label(self.__frame_items, text='Items', font=('calibri', 15, 'bold'), fg='blue').pack()
+        tk.Label(self.__frame_items, text='ITEMS DATA', font=('calibri', 15, 'bold'), fg='blue').pack()
         self.__scroll_items.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Item.header():
             self.__tree_items.heading(head, text=head)
@@ -209,7 +297,7 @@ class TreeviewWindow(tk.Tk):
         self.__scroll_items.config(command=self.__tree_items.yview())
 
         # Customers
-        tk.Label(self.__frame_customers, text='Customers', font=('calibri', 15, 'bold'), fg='blue').pack()
+        tk.Label(self.__frame_customers, text='CUSTOMERS DATA', font=('calibri', 15, 'bold'), fg='blue').pack()
         self.__scroll_customers.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Customer.header():
             self.__tree_customers.heading(head, text=head)
@@ -230,13 +318,16 @@ class TreeviewWindow(tk.Tk):
             self.__tree_customers.delete(row)
 
         # Fetch data
-        cursor.execute('SELECT * FROM items')
+        cursor.execute(f'SELECT {str(self.items_attributes)[1:-1]} FROM items')
         for row in cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
 
-        cursor.execute('SELECT * FROM customers')
+        cursor.execute(f'SELECT {str(self.customers_attributes)[1:-1]} FROM customers')
         for row in cursor.fetchall():
             self.__tree_customers.insert('', 'end', values=row)
+
+         # Message
+        tmsg.showinfo('Reload', 'The data has been reloaded successfully')
 
 
 ##################
