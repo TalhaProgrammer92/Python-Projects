@@ -59,15 +59,6 @@ class Item:
             'sell_date'
         )
 
-    @staticmethod
-    def tk_textvariables() -> tuple:
-        return (
-            tk.StringVar,
-            tk.StringVar,
-            tk.IntVar,
-            tk.StringVar
-        )
-
     def __repr__(self) -> str:
         """ To represent the object as string """
         repr_: str = ''
@@ -187,11 +178,11 @@ create_tables()
 # Add Window
 ######################
 class InsertWizard(tk.Tk):
-    def __init__(self, title: str, options: tuple[str], values: tuple[tk.StringVar | tk.IntVar]):
+    def __init__(self, title: str, options: tuple[str], values: tuple):
         super().__init__()
 
         # Properties
-        self.title(f'{title} Wizard')
+        self.title(f'{title.capitalize()} Wizard')
         self.iconbitmap('icon.ico')
         self.width = 280
         self.height = 150
@@ -200,6 +191,7 @@ class InsertWizard(tk.Tk):
         self.maxsize(self.width, self.height)
 
         # Attributes
+        self.table = title
         self.options = options
         self.entry_values = values
 
@@ -207,7 +199,19 @@ class InsertWizard(tk.Tk):
         self.__appearance()
 
     def insert_data(self):
+        """ Insert data in database """
+        # Insert Data
+        insert(
+            self.table,
+            self.options,
+            (value.get() for value in self.entry_values)
+        )
+
+        # Display Message
         tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+
+        # Destroy the wizard window
+        self.destroy()
 
     def __appearance(self) -> None:
         # Entries
@@ -216,7 +220,7 @@ class InsertWizard(tk.Tk):
             tk.Label(self, text=self.options[i].capitalize(), font='arial 12', fg='blue').grid(row=i, column=0)
 
             # Entry
-            tk.Entry(self, textvariable=self.entry_values[i](), font='calibri 12').grid(row=i, column=1)
+            tk.Entry(self, textvariable=self.entry_values[i], font='calibri 12').grid(row=i, column=1)
 
         # Button
         tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=i + 1, column=1)
@@ -291,10 +295,20 @@ class TreeviewWindow(tk.Tk):
             open(join('records', customers_file))
 
     def add_item(self) -> None:
-        tmsg.showinfo('Action', 'The item has been added successfully')
+        wizard = InsertWizard(
+            'items',
+            Item.header()[1:-1],
+            (tk.StringVar(), tk.StringVar(), tk.IntVar(), tk.StringVar())
+        )
+        wizard.mainloop()
 
     def add_customer(self) -> None:
-        tmsg.showinfo('Action', 'The customer has been added successfully')
+        wizard = InsertWizard(
+            'customers',
+            Customer.header()[1:-1],
+            (tk.StringVar(), tk.StringVar(), tk.IntVar())
+        )
+        wizard.mainloop()
 
     def update_items(self) -> None:
         tmsg.showinfo('Action', 'The item has been updated successfully')
@@ -407,14 +421,7 @@ if __name__ == '__main__':
     # insert('items', Item.header()[1:], item.data)
     # insert('customers', Customer.header()[1:], customer.data)
 
-    # win = TreeviewWindow()
-    # win.mainloop()
-
-    wizard = InsertWizard(
-        'Items',
-        Item.header()[1:-1],
-        Item.tk_textvariables()
-    )
-    wizard.mainloop()
+    win = TreeviewWindow()
+    win.mainloop()
 
     pass
