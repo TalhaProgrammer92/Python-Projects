@@ -1,10 +1,11 @@
+import os.path
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
 import pandas as pd
 from tkinter import ttk
-from os.path import join
-from os import mkdir
+from os.path import join, splitext, exists
+from os import mkdir, listdir
 from datetime import datetime
 
 
@@ -13,6 +14,9 @@ from datetime import datetime
 ########################
 database = sq.connect('data.db')
 cursor = database.cursor()
+
+if not exists('records'):
+    mkdir('records')
 
 
 ##################
@@ -169,6 +173,50 @@ def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: b
 # Call the function
 create_tables()
 
+
+#######################
+# FileName Dialog
+#######################
+class FileNameDialog(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        # Properties
+        self.title('Save as')
+        self.iconbitmap('icon.ico')
+        self.width = 250
+        self.height = 75
+        self.geometry(f'{self.width}x{self.height}')
+        self.maxsize(self.width, self.height)
+        self.minsize(self.width, self.height)
+
+        # File name
+        self.file_name = tk.StringVar()
+
+        # Appearance
+        self.__appearance()
+
+    def parse_name(self) -> None:
+        """ Check if the name is valid or not """
+        name, ext = splitext(self.file_name.get())
+        if ext:
+            tmsg.showerror('Error', 'Please enter the name without any extension')
+            return None
+        name += '.xls'
+        if name in listdir('records'):
+            agree = tmsg.askyesno('Duplication', f"The file '{self.file_name.get()}' already exists in your records folder. Would you like to save it as numbered file?")
+            if agree:
+                name = f'{self.file_name.get()} ({listdir('records').count(name) + 1}).xls'
+            else:
+                return None
+
+    def __appearance(self) -> None:
+        """ Set the appearance """
+        tk.Label(self, text='File Name:', font=('arial', 12)).grid(row=0, column=0)
+        tk.Entry(self, textvariable=self.file_name, font=('arial', 10)).grid(row=0, column=1)
+        tk.Button(self, text='Okay', command=self.parse_name, font=('arial', 12)).grid(row=1, column=1)
+
+
 ##################
 # Excel Wizard
 ##################
@@ -179,7 +227,7 @@ class ExcelWizard(tk.Tk):
         # Properties
         self.title('Excel Wizard')
         self.width = 350
-        self.height = 300
+        self.height = 250
         self.geometry(f'{self.width}x{self.height}')
         self.maxsize(self.width, self.height)
         self.minsize(self.width, self.height)
@@ -197,7 +245,7 @@ class ExcelWizard(tk.Tk):
     def __set_appearance(self) -> None:
         """ Set appearance and behaviour """
         # Label
-        tk.Label(self, text='Save records of your choice', font=('bahnschrift', 15, 'bold'), bg='orange', fg='blue').pack(fill='x')
+        tk.Label(self, text='Save records of your choice', font=('calibri', 15, 'bold'), bg='orange', fg='blue').pack(fill='x')
 
         # Methods Call
         self.__selection_box()
@@ -222,6 +270,10 @@ class ExcelWizard(tk.Tk):
                 self.__customer_options.remove(attribute[0])
             print(attribute[0], attribute[1].get())
 
+    def save_to_excel(self) -> None:
+        """ Save the records in Excel file """
+        pass
+
     def __selection_box(self) -> None:
         """ Set all selection options for user to select which data he wants to store """
         # Frames
@@ -240,6 +292,9 @@ class ExcelWizard(tk.Tk):
         tk.Label(customer_frame, text='CUSTOMER', bg='yellow', fg='green', font='arial 10 bold').pack(fill='x')
         for label, check in self.__customer_check:
             tk.Checkbutton(customer_frame, text=label.capitalize(), variable=check, command=self.action_customer, pady=2).pack()
+
+        # Button
+        tk.Button(customer_frame, text='Proceed', border=1, bg='cyan', fg='black', command=self.save_to_excel, font='cancadia 15').pack()
 
 
 ######################
@@ -354,7 +409,7 @@ class TreeviewWindow(tk.Tk):
     def treeview(self) -> None:
         """ A Treeview to display records in database """
         # Items
-        tk.Label(self.__frame_items, text='ITEMS DATA', font=('calibri', 15, 'bold'), fg='blue').pack()
+        tk.Label(self.__frame_items, text='ITEMS DATA', font=('calibri', 15, 'bold'), fg='blue', bg='orange').pack(fill='x')
         self.__scroll_items.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Item.header():
             self.__tree_items.heading(head, text=head)
@@ -363,7 +418,7 @@ class TreeviewWindow(tk.Tk):
         self.__scroll_items.config(command=self.__tree_items.yview())
 
         # Customers
-        tk.Label(self.__frame_customers, text='CUSTOMERS DATA', font=('calibri', 15, 'bold'), fg='blue').pack()
+        tk.Label(self.__frame_customers, text='CUSTOMERS DATA', font=('calibri', 15, 'bold'), fg='blue', bg='orange').pack(fill='x')
         self.__scroll_customers.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Customer.header():
             self.__tree_customers.heading(head, text=head)
@@ -411,7 +466,10 @@ if __name__ == '__main__':
     # win = TreeviewWindow()
     # win.mainloop()
 
-    excel_win = ExcelWizard()
-    excel_win.mainloop()
+    # excel_win = ExcelWizard()
+    # excel_win.mainloop()
+
+    fd = FileNameDialog()
+    fd.mainloop()
 
     pass
