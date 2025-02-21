@@ -14,6 +14,7 @@ from datetime import datetime
 ########################
 database = sq.connect('data.db')
 cursor = database.cursor()
+excel_file: str | None = None
 
 if not exists('records'):
     mkdir('records')
@@ -198,10 +199,15 @@ class FileNameDialog(tk.Tk):
 
     def parse_name(self) -> None:
         """ Check if the name is valid or not """
+        # Get name and extension
         name, ext = splitext(self.file_name.get())
+
+        # Check if user write extension with name
         if ext:
             tmsg.showerror('Error', 'Please enter the name without any extension')
             return None
+
+        # Check if the file already exist in record
         name += '.xls'
         if name in listdir('records'):
             agree = tmsg.askyesno('Duplication', f"The file '{self.file_name.get()}' already exists in your records folder. Would you like to save it as numbered file?")
@@ -209,6 +215,8 @@ class FileNameDialog(tk.Tk):
                 name = f'{self.file_name.get()} ({listdir('records').count(name) + 1}).xls'
             else:
                 return None
+
+        excel_file = name
 
     def __appearance(self) -> None:
         """ Set the appearance """
