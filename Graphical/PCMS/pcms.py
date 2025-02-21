@@ -5,7 +5,7 @@ import sqlite3 as sq
 import pandas as pd
 from tkinter import ttk
 from os.path import join, splitext, exists
-from os import mkdir, listdir
+from os import mkdir, listdir, open
 from datetime import datetime
 
 
@@ -14,7 +14,6 @@ from datetime import datetime
 ########################
 database = sq.connect('data.db')
 cursor = database.cursor()
-excel_file: str | None = None
 
 if not exists('records'):
     mkdir('records')
@@ -175,136 +174,6 @@ def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: b
 create_tables()
 
 
-#######################
-# FileName Dialog
-#######################
-class FileNameDialog(tk.Tk):
-    def __init__(self):
-        super().__init__()
-
-        # Properties
-        self.title('Save as')
-        self.iconbitmap('icon.ico')
-        self.width = 250
-        self.height = 75
-        self.geometry(f'{self.width}x{self.height}')
-        self.maxsize(self.width, self.height)
-        self.minsize(self.width, self.height)
-
-        # File name
-        self.file_name = tk.StringVar()
-
-        # Appearance
-        self.__appearance()
-
-    def parse_name(self) -> None:
-        """ Check if the name is valid or not """
-        # Get name and extension
-        name, ext = splitext(self.file_name.get())
-
-        # Check if user write extension with name
-        if ext:
-            tmsg.showerror('Error', 'Please enter the name without any extension')
-            return None
-
-        # Check if the file already exist in record
-        name += '.xls'
-        if name in listdir('records'):
-            agree = tmsg.askyesno('Duplication', f"The file '{self.file_name.get()}' already exists in your records folder. Would you like to save it as numbered file?")
-            if agree:
-                name = f'{self.file_name.get()} ({listdir('records').count(name) + 1}).xls'
-            else:
-                return None
-
-        excel_file = name
-
-    def __appearance(self) -> None:
-        """ Set the appearance """
-        tk.Label(self, text='File Name:', font=('arial', 12)).grid(row=0, column=0)
-        tk.Entry(self, textvariable=self.file_name, font=('arial', 10)).grid(row=0, column=1)
-        tk.Button(self, text='Okay', command=self.parse_name, font=('arial', 12)).grid(row=1, column=1)
-
-
-##################
-# Excel Wizard
-##################
-class ExcelWizard(tk.Tk):
-    def __init__(self):
-        super().__init__()
-
-        # Properties
-        self.title('Excel Wizard')
-        self.width = 350
-        self.height = 250
-        self.geometry(f'{self.width}x{self.height}')
-        self.maxsize(self.width, self.height)
-        self.minsize(self.width, self.height)
-        self.iconbitmap('icon.ico')
-
-        # Actions (Attributes)
-        self.__item_check = [[label, tk.IntVar()] for label in Item.header()[1:]]
-        self.__item_options = ['id']
-        self.__customer_check = [[label, tk.IntVar()] for label in Customer.header()[1:]]
-        self.__customer_options = ['id']
-
-        # Function Call
-        self.__set_appearance()
-
-    def __set_appearance(self) -> None:
-        """ Set appearance and behaviour """
-        # Label
-        tk.Label(self, text='Save records of your choice', font=('calibri', 15, 'bold'), bg='orange', fg='blue').pack(fill='x')
-
-        # Methods Call
-        self.__selection_box()
-
-    def action_item(self) -> None:
-        """ Perform some action on user's selection for Item """
-        print('\n*** Item ***')
-        for attribute in self.__item_check:
-            if attribute[1].get() and attribute not in self.__item_options:
-                self.__item_options.append(attribute[0])
-            elif attribute[0] in self.__item_options:
-                self.__item_options.remove(attribute[0])
-            print(attribute[0], attribute[1].get())
-
-    def action_customer(self) -> None:
-        """ Perform some action on user's selection for Customer"""
-        print('\n*** Customer ***')
-        for attribute in self.__customer_check:
-            if attribute[1].get() and attribute[0] not in self.__customer_options:
-                self.__customer_options.append(attribute[0])
-            elif attribute[0] in self.__customer_options:
-                self.__customer_options.remove(attribute[0])
-            print(attribute[0], attribute[1].get())
-
-    def save_to_excel(self) -> None:
-        """ Save the records in Excel file """
-        pass
-
-    def __selection_box(self) -> None:
-        """ Set all selection options for user to select which data he wants to store """
-        # Frames
-        item_frame = tk.Frame(self, padx=5, pady=5)
-        item_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        customer_frame = tk.Frame(self, padx=5, pady=5)
-        customer_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        # Adding Options - Item
-        tk.Label(item_frame, text='ITEM', bg='yellow', fg='green', font='arial 10 bold').pack(fill='x')
-        for label, check in self.__item_check:
-            tk.Checkbutton(item_frame, text=label.capitalize(), variable=check, command=self.action_item, pady=2).pack()
-
-        # Adding Options - Customer
-        tk.Label(customer_frame, text='CUSTOMER', bg='yellow', fg='green', font='arial 10 bold').pack(fill='x')
-        for label, check in self.__customer_check:
-            tk.Checkbutton(customer_frame, text=label.capitalize(), variable=check, command=self.action_customer, pady=2).pack()
-
-        # Button
-        tk.Button(customer_frame, text='Proceed', border=1, bg='cyan', fg='black', command=self.save_to_excel, font='cancadia 15').pack()
-
-
 ######################
 # Treeview Window
 ######################
@@ -351,8 +220,27 @@ class TreeviewWindow(tk.Tk):
 
     def save_to_excel(self) -> None:
         """ To save current data in excel file to increase portability """
-        excel_win = ExcelWizard()
-        excel_win.mainloop()
+
+        # Items
+        query: str = f'SELECT * FROM items'
+        dataframe = pd.read_sql_query(query, database)
+        items_file: str = f'items {datetime.now().strftime("%d-%m-%Y %H %M")}.xls'
+        # print(dataframe.empty)
+        dataframe.to_excel(join('records', items_file), index=False, engine='openpyxl')
+
+
+        # Customers
+        query: str = f'SELECT * FROM customers'
+        dataframe = pd.read_sql_query(query, database)
+        customers_file: str = f'customers {datetime.now().strftime("%d-%m-%Y %H %M")}.xlsx'
+        # print(dataframe.empty)
+        dataframe.to_excel(join('records', customers_file), index=False, engine='openpyxl')
+
+        # Message
+        agreed = tmsg.askyesno('Excel', 'The data has been saved successfully in the records folder. would you like to open these files?')
+        if agreed:
+            open(join('records', items_file))
+            open(join('records', customers_file))
 
     def add_item(self) -> None:
         tmsg.showinfo('Action', 'The item has been added successfully')
@@ -471,13 +359,10 @@ if __name__ == '__main__':
     # insert('items', Item.header()[1:], item.data)
     # insert('customers', Customer.header()[1:], customer.data)
 
-    # win = TreeviewWindow()
-    # win.mainloop()
+    win = TreeviewWindow()
+    win.mainloop()
 
     # excel_win = ExcelWizard()
     # excel_win.mainloop()
-
-    fd = FileNameDialog()
-    fd.mainloop()
 
     pass
