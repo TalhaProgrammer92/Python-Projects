@@ -5,7 +5,7 @@ import sqlite3 as sq
 import pandas as pd
 from tkinter import ttk
 from os.path import join, splitext, exists
-from os import mkdir, listdir, open
+from os import mkdir, listdir, startfile
 from datetime import datetime
 
 
@@ -170,13 +170,35 @@ def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: b
     # Return data retrieved
     return data
 
+def update(table: str, attributes, values, condition: str) -> None:
+    """ to update data in database """
+    query = f'UPDATE {table} SET '
+
+    # Adding values to be updated
+    if isinstance(attributes, tuple) or isinstance(attributes, list):
+        for i in range(len(attributes)):
+            query += f'{attributes[i]} = \'{values[i]}\'' if isinstance(values[i], str) else f'{attributes[i]} = {values[i]}'
+            if i < len(attributes) - 1:
+                query += ', '
+    else:
+        query += f'{attributes} = \'{values}\'' if isinstance(values, str) else f'{attributes} = {values}'
+
+    # Condition
+    query += f' WHERE {condition};'
+
+    # Execute query
+    print(query)
+    cursor.execute(query)
+    database.commit()
+
+
 # Call the function
 create_tables()
 
 
-######################
-# Insert Wizards
-######################
+############################
+# Item Insert Wizard
+############################
 class ItemInsertWizard(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -201,7 +223,7 @@ class ItemInsertWizard(tk.Toplevel):
 
     def insert_data(self):
         """ Insert data in database """
-        # Insert Data
+        # Get Data Entries
         type_ = self.type.get().strip()
         company = self.company.get().strip()
         price = self.price.get().strip()
@@ -255,6 +277,92 @@ class ItemInsertWizard(tk.Toplevel):
 
         # Button
         tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=4, column=1)
+
+
+############################
+# Customer Insert Wizard
+############################
+class CustomerInsertWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Customer Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 280
+        self.height = 150
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variables
+        self.name = tk.StringVar()
+        self.contact = tk.StringVar()
+        self.item_id = tk.StringVar()
+
+        # Function Call
+        self.__appearance()
+
+    def insert_data(self) -> None:
+        # Get Data Entries
+        name = self.name.get().strip()
+        contact = self.contact.get().strip()
+        item_id = self.item_id.get().strip()
+
+        # Validity
+        if not item_id.isdigit():
+            tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct item id')
+            return
+        if not (len(name) > 0 and len(contact) > 0):
+            tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct data')
+            return
+        item_id = int(item_id)
+
+        # Object of Customer
+        customer = Customer(name, contact, item_id)
+
+        # Update Item sell data
+        update(
+            'items',
+            'sell_date',
+            customer.purchase_date,
+            f'id = {item_id}'
+        )
+
+        # Add Customer
+        insert(
+            'customers',
+            Customer.header()[1:],
+            customer.data
+        )
+
+        # Display Message
+        tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+
+        # Load data
+        self.master.load_treeview_data()
+
+        # Destroy the wizard window
+        self.destroy()
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=0, column=0)
+        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=2, column=0)
+
+        # Entry
+        self.entry_name = tk.Entry(self, textvariable=self.name, font='calibri 12')
+        self.entry_name.grid(row=0, column=1)
+
+        self.entry_contact = tk.Entry(self, textvariable=self.contact, font='calibri 12')
+        self.entry_contact.grid(row=1, column=1)
+
+        self.entry_item_id = tk.Entry(self, textvariable=self.item_id, font='calibri 12')
+        self.entry_item_id.grid(row=2, column=1)
+
+        # Button
+        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=3, column=1)
 
 
 ######################
@@ -320,17 +428,18 @@ class TreeviewWindow(tk.Tk):
         dataframe.to_excel(join('records', customers_file), index=False, engine='openpyxl')
 
         # Message
-        agreed = tmsg.askyesno('Excel', 'The data has been saved successfully in the records folder. would you like to open these files?')
+        agreed = tmsg.askyesno('Excel', 'The data has been saved successfully in the records folder. Would you like to open these files?')
         if agreed:
-            open(join('records', items_file))
-            open(join('records', customers_file))
+            startfile(join('records', items_file))
+            startfile(join('records', customers_file))
 
     def add_item(self) -> None:
         insert_wizard = ItemInsertWizard(self)  # Pass 'self' as master
         insert_wizard.grab_set()  # Makes the window modal (disables main window until closed)
 
     def add_customer(self) -> None:
-        pass
+        insert_wizard = CustomerInsertWizard(self)
+        insert_wizard.grab_set()
 
     def update_items(self) -> None:
         tmsg.showinfo('Action', 'The item has been updated successfully')
