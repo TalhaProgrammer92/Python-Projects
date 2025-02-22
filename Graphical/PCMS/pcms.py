@@ -178,7 +178,7 @@ create_tables()
 # Add Window
 ######################
 class InsertWizard(tk.Tk):
-    def __init__(self, title: str, options: tuple[str], values: tuple):
+    def __init__(self, title: str, options: tuple[str], values: list):
         super().__init__()
 
         # Properties
@@ -201,10 +201,15 @@ class InsertWizard(tk.Tk):
     def insert_data(self):
         """ Insert data in database """
         # Insert Data
+        if self.table == 'items':
+            obj = Item(self.entry_values[0].get(), self.entry_values[1].get(), self.entry_values[2].get(), self.entry_values[3].get())
+        elif self.table == 'customers':
+            obj = Customer(self.entry_values[0].get(), self.entry_values[1].get(), self.entry_values[2].get())
+
         insert(
             self.table,
             self.options,
-            (value.get() for value in self.entry_values)
+            obj.data
         )
 
         # Display Message
@@ -298,7 +303,7 @@ class TreeviewWindow(tk.Tk):
         wizard = InsertWizard(
             'items',
             Item.header()[1:-1],
-            (tk.StringVar(), tk.StringVar(), tk.IntVar(), tk.StringVar())
+            [tk.StringVar(), tk.StringVar(), tk.IntVar(), tk.StringVar()]
         )
         wizard.mainloop()
 
@@ -306,7 +311,7 @@ class TreeviewWindow(tk.Tk):
         wizard = InsertWizard(
             'customers',
             Customer.header()[1:-1],
-            (tk.StringVar(), tk.StringVar(), tk.IntVar())
+            [tk.StringVar(), tk.StringVar(), tk.IntVar()]
         )
         wizard.mainloop()
 
