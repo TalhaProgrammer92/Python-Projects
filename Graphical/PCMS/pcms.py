@@ -388,11 +388,15 @@ class TreeviewWindow(tk.Tk):
 
     def treeview(self) -> None:
         """ A Treeview to display records in database """
+        # Treeview style
+        style = ttk.Style()
+        style.configure("Treeview.Heading", font=("Arial", 9, "bold"), bg="silver")  # Bold headings
+
         # Items
         tk.Label(self.__frame_items, text='ITEMS DATA', font=('calibri', 15, 'bold'), fg='blue', bg='orange').pack(fill='x')
         self.__scroll_items.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Item.header():
-            self.__tree_items.heading(head, text=head)
+            self.__tree_items.heading(head, text=head.upper())
             self.__tree_items.column(head, width=50)
         self.__tree_items.pack(fill=tk.BOTH, expand=True)
         self.__scroll_items.config(command=self.__tree_items.yview())
@@ -401,7 +405,7 @@ class TreeviewWindow(tk.Tk):
         tk.Label(self.__frame_customers, text='CUSTOMERS DATA', font=('calibri', 15, 'bold'), fg='blue', bg='orange').pack(fill='x')
         self.__scroll_customers.pack(side=tk.RIGHT, fill=tk.Y)
         for head in Customer.header():
-            self.__tree_customers.heading(head, text=head)
+            self.__tree_customers.heading(head, text=head.upper())
             self.__tree_customers.column(head, width=25)
         self.__tree_customers.pack(fill=tk.BOTH, expand=True)
         self.__scroll_customers.config(command=self.__tree_customers.yview())
