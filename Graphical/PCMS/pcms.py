@@ -175,14 +175,14 @@ create_tables()
 
 
 ######################
-# Add Window
+# Insert Wizards
 ######################
-class InsertWizard(tk.Tk):
-    def __init__(self, title: str, options: tuple[str], values: list):
+class ItemInsertWizard(tk.Tk):
+    def __init__(self):
         super().__init__()
 
         # Properties
-        self.title(f'{title.capitalize()} Wizard')
+        self.title('Item Wizard')
         self.iconbitmap('icon.ico')
         self.width = 280
         self.height = 150
@@ -190,10 +190,11 @@ class InsertWizard(tk.Tk):
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
 
-        # Attributes
-        self.table = title
-        self.options = options
-        self.entry_values = values
+        # Entry Variables
+        self.type = tk.StringVar()
+        self.company = tk.StringVar()
+        self.price = tk.IntVar()
+        self.detail = tk.StringVar()
 
         # Function call
         self.__appearance()
@@ -201,15 +202,21 @@ class InsertWizard(tk.Tk):
     def insert_data(self):
         """ Insert data in database """
         # Insert Data
-        if self.table == 'items':
-            obj = Item(self.entry_values[0].get(), self.entry_values[1].get(), self.entry_values[2].get(), self.entry_values[3].get())
-        elif self.table == 'customers':
-            obj = Customer(self.entry_values[0].get(), self.entry_values[1].get(), self.entry_values[2].get())
+        type_ = self.type.get()
+        company = self.company.get()
+        price = self.price.get()
+        detail = self.detail.get()
 
+        # Validity
+        if not (len(type_) > 0 and len(company) > 0 and price > 0):
+            tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct data')
+            return None
+
+        item = Item(type_, company, price, detail)
         insert(
-            self.table,
-            self.options,
-            obj.data
+            'items',
+            Item.header()[1:],
+            item.data
         )
 
         # Display Message
@@ -219,16 +226,20 @@ class InsertWizard(tk.Tk):
         self.destroy()
 
     def __appearance(self) -> None:
-        # Entries
-        for i in range(len(self.options)):
-            # Label
-            tk.Label(self, text=self.options[i].capitalize(), font='arial 12', fg='blue').grid(row=i, column=0)
+        # Labels
+        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=0, column=0)
+        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=3, column=0)
 
-            # Entry
-            tk.Entry(self, textvariable=self.entry_values[i], font='calibri 12').grid(row=i, column=1)
+        # Entry
+        tk.Entry(self, textvariable=self.type, font='calibri 12').grid(row=0, column=1)
+        tk.Entry(self, textvariable=self.company, font='calibri 12').grid(row=1, column=1)
+        tk.Entry(self, textvariable=self.price, font='calibri 12').grid(row=2, column=1)
+        tk.Entry(self, textvariable=self.detail, font='calibri 12').grid(row=3, column=1)
 
         # Button
-        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=i + 1, column=1)
+        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=4, column=1)
 
 
 ######################
@@ -300,20 +311,11 @@ class TreeviewWindow(tk.Tk):
             open(join('records', customers_file))
 
     def add_item(self) -> None:
-        wizard = InsertWizard(
-            'items',
-            Item.header()[1:-1],
-            [tk.StringVar(), tk.StringVar(), tk.IntVar(), tk.StringVar()]
-        )
+        wizard = ItemInsertWizard()
         wizard.mainloop()
 
     def add_customer(self) -> None:
-        wizard = InsertWizard(
-            'customers',
-            Customer.header()[1:-1],
-            [tk.StringVar(), tk.StringVar(), tk.IntVar()]
-        )
-        wizard.mainloop()
+        pass
 
     def update_items(self) -> None:
         tmsg.showinfo('Action', 'The item has been updated successfully')
