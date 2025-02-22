@@ -184,10 +184,11 @@ def update(table: str, attributes, values, condition: str) -> None:
         query += f'{attributes} = \'{values}\'' if isinstance(values, str) else f'{attributes} = {values}'
 
     # Condition
-    query += f' WHERE {condition};'
+    if len(condition) > 0:
+        query += f' WHERE {condition};'
 
     # Execute query
-    print(query)
+    # print(query)
     cursor.execute(query)
     database.commit()
 
@@ -318,6 +319,13 @@ class CustomerInsertWizard(tk.Toplevel):
             return
         item_id = int(item_id)
 
+        # Check item existence
+        cursor.execute("SELECT COUNT(*) FROM items WHERE id = ?", (item_id,))
+        exists = cursor.fetchone()[0]  # Fetch the count
+        if not exists:
+            tmsg.showerror('Insert Wizard', f'The item \'{item_id}\' does not exist in the database')
+            return
+
         # Object of Customer
         customer = Customer(name, contact, item_id)
 
@@ -363,6 +371,117 @@ class CustomerInsertWizard(tk.Toplevel):
 
         # Button
         tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=3, column=1)
+
+
+############################
+# Item Update Wizard
+############################
+class ItemUpdateWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Item Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 280
+        self.height = 170
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variables
+        self.type = tk.StringVar()
+        self.company = tk.StringVar()
+        self.price = tk.StringVar()
+        self.detail = tk.StringVar()
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def update_data(self) -> None:
+        """ Update data in database """
+        # Get Data Entries
+        type_ = self.type.get().strip()
+        company = self.company.get().strip()
+        price = self.price.get().strip()
+        detail = self.detail.get().strip()
+        condition = self.condition.get().strip()
+
+        # Validity
+        # print(type_, company, price, detail, condition)
+        if len(condition) == 0:
+            if not tmsg.askyesno('Update Wizard', 'You did not provide any condition. This would effect your entire data of items. Would you like to proceed at your own risk?'):
+                return
+
+        if not price.isdigit() and len(price) > 0:
+            tmsg.showerror('Update Wizard', 'Please add correct price value')
+            return
+        price = int(price)
+
+        if len(type_) == 0 and len(company) == 0 and len(detail) == 0 and price == 0:
+            tmsg.showerror('Update Wizard', 'Please add some data to update')
+            return
+
+        # Data lists
+        data = []
+        header = []
+        if len(type_) > 0:
+            data.append(type_)
+            header.append(Item.header()[1])
+        if len(company) > 0:
+            data.append(company)
+            header.append(Item.header()[2])
+        if price > 0:
+            data.append(price)
+            header.append(Item.header()[3])
+        if len(detail) > 0:
+            data.append(detail)
+            header.append(Item.header()[4])
+
+        # Update data
+        update(
+            'items',
+            header,
+            data,
+            condition
+        )
+
+        # Display Message
+        tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
+
+        # Load data
+        self.master.load_treeview_data()
+
+        # Destroy the wizard window
+        self.destroy()
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=0, column=0)
+        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=4, column=0)
+
+        # Entry
+        self.entry_type = tk.Entry(self, textvariable=self.type, font='calibri 12')
+        self.entry_type.grid(row=0, column=1)
+
+        self.entry_company = tk.Entry(self, textvariable=self.company, font='calibri 12')
+        self.entry_company.grid(row=1, column=1)
+
+        self.entry_price = tk.Entry(self, textvariable=self.price, font='calibri 12')
+        self.entry_price.grid(row=2, column=1)
+
+        self.entry_detail = tk.Entry(self, textvariable=self.detail, font='calibri 12')
+        self.entry_detail.grid(row=3, column=1)
+
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=4, column=1)
+
+        # Button
+        tk.Button(self, text='Update', font='arial 13', command=self.update_data).grid(row=5, column=1)
 
 
 ######################
@@ -442,7 +561,8 @@ class TreeviewWindow(tk.Tk):
         insert_wizard.grab_set()
 
     def update_items(self) -> None:
-        tmsg.showinfo('Action', 'The item has been updated successfully')
+        update_wizard = ItemUpdateWizard(self)
+        update_wizard.grab_set()
 
     def update_customers(self) -> None:
         tmsg.showinfo('Action', 'The customer has been updated successfully')
