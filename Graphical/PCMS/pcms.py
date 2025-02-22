@@ -177,9 +177,9 @@ create_tables()
 ######################
 # Insert Wizards
 ######################
-class ItemInsertWizard(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class ItemInsertWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
 
         # Properties
         self.title('Item Wizard')
@@ -193,7 +193,7 @@ class ItemInsertWizard(tk.Tk):
         # Entry Variables
         self.type = tk.StringVar()
         self.company = tk.StringVar()
-        self.price = tk.IntVar()
+        self.price = tk.StringVar()
         self.detail = tk.StringVar()
 
         # Function call
@@ -202,16 +202,21 @@ class ItemInsertWizard(tk.Tk):
     def insert_data(self):
         """ Insert data in database """
         # Insert Data
-        type_ = self.type.get()
-        company = self.company.get()
-        price = self.price.get()
-        detail = self.detail.get()
+        type_ = self.type.get().strip()
+        company = self.company.get().strip()
+        price = self.price.get().strip()
+        detail = self.detail.get().strip()
 
         # Validity
+        if not price.isdigit():
+            tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct price')
+            return
+        price = int(price)
         if not (len(type_) > 0 and len(company) > 0 and price > 0):
             tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct data')
-            return None
+            return
 
+        # Object of Item
         item = Item(type_, company, price, detail)
         insert(
             'items',
@@ -221,6 +226,9 @@ class ItemInsertWizard(tk.Tk):
 
         # Display Message
         tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+
+        # Load data
+        self.master.load_treeview_data()
 
         # Destroy the wizard window
         self.destroy()
@@ -233,10 +241,17 @@ class ItemInsertWizard(tk.Tk):
         tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=3, column=0)
 
         # Entry
-        tk.Entry(self, textvariable=self.type, font='calibri 12').grid(row=0, column=1)
-        tk.Entry(self, textvariable=self.company, font='calibri 12').grid(row=1, column=1)
-        tk.Entry(self, textvariable=self.price, font='calibri 12').grid(row=2, column=1)
-        tk.Entry(self, textvariable=self.detail, font='calibri 12').grid(row=3, column=1)
+        self.entry_type = tk.Entry(self, textvariable=self.type, font='calibri 12')
+        self.entry_type.grid(row=0, column=1)
+
+        self.entry_company = tk.Entry(self, textvariable=self.company, font='calibri 12')
+        self.entry_company.grid(row=1, column=1)
+
+        self.entry_price = tk.Entry(self, textvariable=self.price, font='calibri 12')
+        self.entry_price.grid(row=2, column=1)
+
+        self.entry_detail = tk.Entry(self, textvariable=self.detail, font='calibri 12')
+        self.entry_detail.grid(row=3, column=1)
 
         # Button
         tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=4, column=1)
@@ -311,8 +326,8 @@ class TreeviewWindow(tk.Tk):
             open(join('records', customers_file))
 
     def add_item(self) -> None:
-        wizard = ItemInsertWizard()
-        wizard.mainloop()
+        insert_wizard = ItemInsertWizard(self)  # Pass 'self' as master
+        insert_wizard.grab_set()  # Makes the window modal (disables main window until closed)
 
     def add_customer(self) -> None:
         pass
