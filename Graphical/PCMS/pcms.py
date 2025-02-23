@@ -482,6 +482,123 @@ class ItemUpdateWizard(tk.Toplevel):
         tk.Button(self, text='Update', font='arial 13', command=self.update_data).grid(row=5, column=1)
 
 
+############################
+# Customer Update Wizard
+############################
+class CustomerUpdateWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Customer Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 280
+        self.height = 170
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variable
+        self.name = tk.StringVar()
+        self.contact = tk.StringVar()
+        self.item_id = tk.StringVar()
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def update_data(self) -> None:
+        """ Update data in database """
+        # Get Data Entries
+        name = self.name.get().strip()
+        contact = self.contact.get().strip()
+        item_id = self.item_id.get().strip()
+        condition = self.condition.get().strip()
+
+        # Validity
+        # print(type_, company, price, detail, condition)
+        if len(condition) == 0:
+            if not tmsg.askyesno('Update Wizard', 'You did not provide any condition. This would effect your entire data of items. Would you like to proceed at your own risk?'):
+                return
+
+        if len(name) == 0 and len(contact) == 0 and not item_id.isdigit():
+            tmsg.showerror('Update Wizard', 'Please add some data to update')
+            return
+        elif item_id.isdigit():
+            item_id = int(item_id)
+
+        # Data lists
+        has_item_id: bool = False
+        data = []
+        header = []
+        if len(name) > 0:
+            data.append(name)
+            header.append(Customer.header()[1])
+        if len(contact) > 0:
+            data.append(contact)
+            header.append(Customer.header()[2])
+        if isinstance(item_id, int):
+            if item_id > 0:
+                data.append(item_id)
+                header.append(Customer.header()[3])
+                has_item_id = True
+
+        # Update data
+        if has_item_id:
+            # Update Item's sell date
+            date = get_current_datetime()
+            update(
+                'items',
+                'sell_date',
+                date,
+                f'id={item_id}'
+            )
+
+            # Append Purchase data
+            data.append(date)
+            header.append(Customer.header()[4])
+
+        # Update Customers' data
+        update(
+            'customers',
+            header,
+            data,
+            condition
+        )
+
+        # Display Message
+        tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
+
+        # Load data
+        self.master.load_treeview_data()
+
+        # Destroy the wizard window
+        self.destroy()
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=0, column=0)
+        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=3, column=0)
+
+        # Entry
+        self.entry_name = tk.Entry(self, textvariable=self.name, font='calibri 12')
+        self.entry_name.grid(row=0, column=1)
+
+        self.entry_contact = tk.Entry(self, textvariable=self.contact, font='calibri 12')
+        self.entry_contact.grid(row=1, column=1)
+
+        self.entry_item_id = tk.Entry(self, textvariable=self.item_id, font='calibri 12')
+        self.entry_item_id.grid(row=2, column=1)
+
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=3, column=1)
+
+        # Button
+        tk.Button(self, text='Update', font='arial 13', command=self.update_data).grid(row=4, column=1)
+
+
 ######################
 # Treeview Window
 ######################
@@ -563,7 +680,8 @@ class TreeviewWindow(tk.Tk):
         update_wizard.grab_set()
 
     def update_customers(self) -> None:
-        tmsg.showinfo('Action', 'The customer has been updated successfully')
+        update_wizard = CustomerUpdateWizard(self)
+        update_wizard.grab_set()
 
     def remove_items(self) -> None:
         tmsg.showinfo('Action', 'The item has been removed successfully')
