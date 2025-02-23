@@ -389,7 +389,7 @@ class ItemUpdateWizard(tk.Toplevel):
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
 
-        # Entry Variables
+        # Entry Variable
         self.type = tk.StringVar()
         self.company = tk.StringVar()
         self.price = tk.StringVar()
@@ -414,14 +414,11 @@ class ItemUpdateWizard(tk.Toplevel):
             if not tmsg.askyesno('Update Wizard', 'You did not provide any condition. This would effect your entire data of items. Would you like to proceed at your own risk?'):
                 return
 
-        if not price.isdigit() and len(price) > 0:
-            tmsg.showerror('Update Wizard', 'Please add correct price value')
-            return
-        price = int(price)
-
-        if len(type_) == 0 and len(company) == 0 and len(detail) == 0 and price == 0:
+        if len(type_) == 0 and len(company) == 0 and len(detail) == 0 and not price.isdigit():
             tmsg.showerror('Update Wizard', 'Please add some data to update')
             return
+        elif price.isdigit():
+            price = int(price)
 
         # Data lists
         data = []
@@ -432,9 +429,10 @@ class ItemUpdateWizard(tk.Toplevel):
         if len(company) > 0:
             data.append(company)
             header.append(Item.header()[2])
-        if price > 0:
-            data.append(price)
-            header.append(Item.header()[3])
+        if isinstance(price, int):
+            if price > 0:
+                data.append(price)
+                header.append(Item.header()[3])
         if len(detail) > 0:
             data.append(detail)
             header.append(Item.header()[4])
