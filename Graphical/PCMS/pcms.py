@@ -60,12 +60,12 @@ class Item:
     @staticmethod
     def header() -> tuple:
         return (
-            'id',
-            'type',
-            'company',
-            'price',
-            'detail',
-            'sell_date'
+            'id',           # 0
+            'type',         # 1
+            'company',      # 2
+            'price',        # 3
+            'detail',       # 4
+            'sell_date'     # 5
         )
 
     def __repr__(self) -> str:
@@ -101,11 +101,11 @@ class Customer:
     @staticmethod
     def header() -> tuple:
         return (
-            'id',
-            'name',
-            'contact',
-            'item_id',
-            'purchase_date'
+            'id',               # 0
+            'name',             # 1
+            'contact',          # 2
+            'item_id',          # 3
+            'purchase_date'     # 4
         )
 
     def __repr__(self) -> str:
@@ -162,7 +162,7 @@ def insert(table: str, names: tuple, values: tuple):
     cursor.execute(f'INSERT INTO {table} {names} VALUES {values}')
     database.commit()
 
-def retrieve(table: str, attributes: tuple, condition: str = '', commit: bool = False) -> list:
+def retrieve(table: str, attributes: tuple | list, condition: str = '', commit: bool = False) -> list:
     """ To retrieve data from database """
     # Query
     query: str = f"SELECT {', '.join(attributes)} FROM {table}" if len(attributes[0]) > 1 else f"SELECT {attributes} FROM {table}"
@@ -676,7 +676,7 @@ class ItemRemoveWizard(tk.Toplevel):
         self.__appearance()
 
     def remove_data(self) -> None:
-        """ Update data in database """
+        """ Remove data from database """
         # Get Entry
         condition: str = self.condition.get().strip()
 
@@ -737,7 +737,7 @@ class CustomerRemoveWizard(tk.Toplevel):
         self.__appearance()
 
     def remove_data(self) -> None:
-        """ Update data in database """
+        """ Remove data from database """
         # Get Entry
         condition: str = self.condition.get().strip()
 
@@ -775,6 +775,112 @@ class CustomerRemoveWizard(tk.Toplevel):
         tk.Button(self, text='Remove', font='arial 13', command=self.remove_data, bg='red', relief='groove').grid(row=2, column=1)
 
 
+############################
+# Item Filter Wizard
+############################
+class ItemFilterWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Item Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 240
+        self.height = 250
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variable
+        self.type = tk.BooleanVar()
+        self.company = tk.BooleanVar()
+        self.price = tk.BooleanVar()
+        self.detail = tk.BooleanVar()
+        self.sell_date = tk.BooleanVar()
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def filter_data(self) -> None:
+        """ Filter data in database """
+        # Reload Actual Attributes
+        self.master.reload_items_attributes()
+
+        # Filter Attributes
+        if not self.type.get() and Item.header()[1] in self.master.items_attributes:
+            self.master.items_attributes.remove(Item.header()[1])
+        elif Item.header()[1] not in self.master.items_attributes:
+            self.master.items_attributes.append(Item.header()[1])
+
+        if not self.company.get() and Item.header()[2] in self.master.items_attributes:
+            self.master.items_attributes.remove(Item.header()[2])
+        elif Item.header()[2] not in self.master.items_attributes:
+            self.master.items_attributes.append(Item.header()[2])
+
+        if not self.price.get() and Item.header()[3] in self.master.items_attributes:
+            self.master.items_attributes.remove(Item.header()[3])
+        elif Item.header()[3] not in self.master.items_attributes:
+            self.master.items_attributes.append(Item.header()[3])
+
+        if not self.detail.get() and Item.header()[4] in self.master.items_attributes:
+            self.master.items_attributes.remove(Item.header()[4])
+        elif Item.header()[4] not in self.master.items_attributes:
+            self.master.items_attributes.append(Item.header()[4])
+
+        if not self.sell_date.get() and Item.header()[5] in self.master.items_attributes:
+            self.master.items_attributes.remove(Item.header()[5])
+        elif Item.header()[5] not in self.master.items_attributes:
+            self.master.items_attributes.append(Item.header()[5])
+
+        self.master.items_condition = self.condition.get().strip()
+
+        try:
+            # Load data
+            self.master.load_treeview_data()
+
+            # Destroy the wizard window
+            self.destroy()
+
+            # Message
+            tmsg.showinfo('Filter Wizard', 'Your data has been filtered successfully')
+        except sq.OperationalError:
+            tmsg.showerror('Filter Wizard', 'Please check your condition')
+            self.master.reload_items_attributes()
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Select Attributes to Filter', font='arial 15', fg='blue', bg='orange').grid(row=0, column=0, columnspan=2)
+        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=4, column=0)
+        tk.Label(self, text='Sell Date', font='arial 12', fg='blue').grid(row=5, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=6, column=0)
+
+        # Entry
+        self.check_type = tk.Checkbutton(self, variable=self.type, font='calibri 12')
+        self.check_type.grid(row=1, column=1)
+
+        self.check_company = tk.Checkbutton(self, variable=self.company, font='calibri 12')
+        self.check_company.grid(row=2, column=1)
+
+        self.check_price = tk.Checkbutton(self, variable=self.price, font='calibri 12')
+        self.check_price.grid(row=3, column=1)
+
+        self.check_detail = tk.Checkbutton(self, variable=self.detail, font='calibri 12')
+        self.check_detail.grid(row=4, column=1)
+
+        self.check_sell_date = tk.Checkbutton(self, variable=self.sell_date, font='calibri 12')
+        self.check_sell_date.grid(row=5, column=1)
+
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=6, column=1)
+
+        # Button
+        tk.Button(self, text='Filter', font='arial 13', command=self.filter_data, bg='green', relief='groove').grid(row=7, column=1)
+
+
 ######################
 # Treeview Window
 ######################
@@ -792,6 +898,8 @@ class TreeviewWindow(tk.Tk):
         # Attributes to show
         self.items_attributes = list(Item.header())
         self.customers_attributes = list(Customer.header())
+        self.items_condition: str = ''
+        self.customers_condition: str = ''
 
         # Some Frames
         self.__frame_items = tk.Frame(self, padx=10, pady=10)
@@ -811,9 +919,15 @@ class TreeviewWindow(tk.Tk):
         # Set the appearance
         self.__appearance()
 
-    def remove_from_items_attributes(self, item: str) -> None:
-        """ Remove an attribute from items """
-        pass
+    def reload_items_attributes(self) -> None:
+        """ Reload attributes of Item """
+        self.items_attributes = list(Item.header())
+        self.items_condition = ''
+
+    def reload_customers_attributes(self) -> None:
+        """ Reload attributes of Customer """
+        self.customers_attributes = list(Customer.header())
+        self.customers_condition = ''
 
     def __appearance(self) -> None:
         """ Set appearance """
@@ -872,7 +986,8 @@ class TreeviewWindow(tk.Tk):
         remove_wizard.grab_set()
 
     def filter_items(self) -> None:
-        tmsg.showinfo('Filter', 'The items data has been filtered successfully')
+        filter_wizard = ItemFilterWizard(self)
+        filter_wizard.grab_set()
 
     def filter_customers(self) -> None:
         tmsg.showinfo('Filter', 'The customers data has been filtered successfully')
@@ -884,7 +999,7 @@ class TreeviewWindow(tk.Tk):
 
         # File Menu
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Reload", command=self.load_treeview_data)
+        file_menu.add_command(label="Reload", command=self.reload_treeview_data)
         file_menu.add_command(label="Save to Excel", command=self.save_to_excel)
         file_menu.add_separator()  # Add a separator line
         file_menu.add_command(label="Exit", command=exit)
@@ -950,16 +1065,31 @@ class TreeviewWindow(tk.Tk):
             self.__tree_customers.delete(row)
 
         # Fetch data
-        cursor.execute(f"SELECT {', '.join(self.items_attributes)} FROM items")
+        query: str = f"SELECT {', '.join(self.items_attributes)} FROM items"
+        if len(self.items_condition) > 0:
+            query += f" WHERE {self.items_condition}"
+        # print(query)
+        cursor.execute(query)
         for row in cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
 
-        cursor.execute(f"SELECT {', '.join(self.customers_attributes)} FROM customers")
+        query = f"SELECT {', '.join(self.customers_attributes)} FROM customers"
+        if len(self.customers_condition) > 0:
+            query += f" WHERE {self.customers_condition}"
+        # print(query)
+        cursor.execute(query)
         for row in cursor.fetchall():
             self.__tree_customers.insert('', 'end', values=row)
 
          # Message
         # tmsg.showinfo('Reload', 'The data has been reloaded successfully')
+
+    def reload_treeview_data(self) -> None:
+        """ To load data in tree-view with default values """
+        self.reload_items_attributes()
+        self.reload_customers_attributes()
+        self.load_treeview_data()
+        tmsg.showinfo('Reload', 'The data has been reloaded successfully')
 
 
 ##################
