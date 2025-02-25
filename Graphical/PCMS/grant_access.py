@@ -3,6 +3,10 @@ from os.path import exists, join
 from os import system as cmd
 
 try:
+    # Terminal's Operations
+    cmd('color 02')
+    cmd('title Grant Access v1.0')
+
     # Get Path
     while True:
         path = input('Enter path of your software file: ')
