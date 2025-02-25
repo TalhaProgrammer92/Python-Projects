@@ -1,6 +1,8 @@
 from PyMisc.system import get_mac_address
 from os.path import exists, join
 from os import system as cmd
+from shlex import quote
+from subprocess import run
 
 try:
     # Terminal's Operations
@@ -25,7 +27,7 @@ try:
         file.write(mac)
 
     # Hide the file
-    cmd(f'Attrib +h +r +s {path}')
+    run(f'Attrib +h +r +s "{path}"', shell=True)
 
     # Result
     print('Access Granted! Now you can run your software')

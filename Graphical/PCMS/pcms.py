@@ -162,17 +162,19 @@ def insert(table: str, names: tuple, values: tuple):
     cursor.execute(f'INSERT INTO {table} {names} VALUES {values}')
     database.commit()
 
-def retrieve(table: str, attributes: tuple | str, condition: str = '', commit: bool = False) -> list:
+def retrieve(table: str, attributes: tuple, condition: str = '', commit: bool = False) -> list:
     """ To retrieve data from database """
     # Query
-    query: str = f'SELECT {attributes} FROM {table}'
+    query: str = f"SELECT {', '.join(attributes)} FROM {table}" if len(attributes[0]) > 1 else f"SELECT {attributes} FROM {table}"
 
     # Condition
     if len(condition) > 0:
         query += f' WHERE {condition}'
 
     # Executing query
-    data: list = list(cursor.execute(query))
+    # print(query)
+    cursor.execute(query)
+    data = cursor.fetchone()
     if commit:
         database.commit()
 
@@ -184,13 +186,17 @@ def update(table: str, attributes, values, condition: str) -> None:
     query = f'UPDATE {table} SET '
 
     # Adding values to be updated
-    if isinstance(attributes, tuple) or isinstance(attributes, list):
-        for i in range(len(attributes)):
-            query += f'{attributes[i]} = \'{values[i]}\'' if isinstance(values[i], str) else f'{attributes[i]} = {values[i]}'
-            if i < len(attributes) - 1:
-                query += ', '
+    if len(attributes) == len(values):
+        if not isinstance(attributes, str) and not isinstance(values, str):
+            for i in range(len(attributes)):
+                query += f'{attributes[i]} = \'{values[i]}\'' if isinstance(values[i], str) else f'{attributes[i]} = {values[i]}'
+                if i < len(attributes) - 1:
+                    query += ', '
+        else:
+            query += f'{attributes} = \'{values}\'' if isinstance(values, str) else f'{attributes} = {values}'
     else:
         query += f'{attributes} = \'{values}\'' if isinstance(values, str) else f'{attributes} = {values}'
+
 
     # Condition
     if len(condition) > 0:
@@ -201,6 +207,10 @@ def update(table: str, attributes, values, condition: str) -> None:
     cursor.execute(query)
     database.commit()
 
+def remove(table: str, condition: str):
+    """ To remove data from database """
+    cursor.execute(f'DELETE FROM {table} WHERE {condition}')
+    database.commit()
 
 # Call the function
 create_tables()
@@ -216,8 +226,8 @@ class ItemInsertWizard(tk.Toplevel):
         # Properties
         self.title('Item Wizard')
         self.iconbitmap('icon.ico')
-        self.width = 280
-        self.height = 150
+        self.width = 250
+        self.height = 160
         self.geometry(f'{self.width}x{self.height}')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
@@ -248,45 +258,51 @@ class ItemInsertWizard(tk.Toplevel):
             tmsg.showerror('Insert Wizard', 'Please make sure you have entered correct data')
             return
 
-        # Object of Item
-        item = Item(type_, company, price, detail)
-        insert(
-            'items',
-            Item.header()[1:],
-            item.data
-        )
+        try:
+            # Object of Item
+            item = Item(type_, company, price, detail)
 
-        # Display Message
-        tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+            # Insert data
+            insert(
+                'items',
+                Item.header()[1:],
+                item.data
+            )
 
-        # Load data
-        self.master.load_treeview_data()
+            # Display Message
+            tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
 
-        # Destroy the wizard window
-        self.destroy()
+            # Load data
+            self.master.load_treeview_data()
+
+            # Destroy the wizard window
+            self.destroy()
+        except sq.OperationalError:
+            tmsg.showerror('Insert Wizard', 'Please make sure you\'ve entered correct data')
 
     def __appearance(self) -> None:
         # Labels
-        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=0, column=0)
-        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=1, column=0)
-        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=2, column=0)
-        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Insert Some Data', font='arial 15', bg='orange', fg='blue').grid(row=0, column=1)
+        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=4, column=0)
 
         # Entry
         self.entry_type = tk.Entry(self, textvariable=self.type, font='calibri 12')
-        self.entry_type.grid(row=0, column=1)
+        self.entry_type.grid(row=1, column=1)
 
         self.entry_company = tk.Entry(self, textvariable=self.company, font='calibri 12')
-        self.entry_company.grid(row=1, column=1)
+        self.entry_company.grid(row=2, column=1)
 
         self.entry_price = tk.Entry(self, textvariable=self.price, font='calibri 12')
-        self.entry_price.grid(row=2, column=1)
+        self.entry_price.grid(row=3, column=1)
 
         self.entry_detail = tk.Entry(self, textvariable=self.detail, font='calibri 12')
-        self.entry_detail.grid(row=3, column=1)
+        self.entry_detail.grid(row=4, column=1)
 
         # Button
-        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=4, column=1)
+        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data, bg='cyan', relief='groove').grid(row=5, column=1)
 
 
 ############################
@@ -299,7 +315,7 @@ class CustomerInsertWizard(tk.Toplevel):
         # Properties
         self.title('Customer Wizard')
         self.iconbitmap('icon.ico')
-        self.width = 280
+        self.width = 240
         self.height = 150
         self.geometry(f'{self.width}x{self.height}')
         self.minsize(self.width, self.height)
@@ -328,58 +344,62 @@ class CustomerInsertWizard(tk.Toplevel):
             return
         item_id = int(item_id)
 
-        # Check item existence
-        cursor.execute("SELECT COUNT(*) FROM items WHERE id = ?", (item_id,))
-        exists = cursor.fetchone()[0]  # Fetch the count
-        if not exists:
-            tmsg.showerror('Insert Wizard', f'The item \'{item_id}\' does not exist in the database')
-            return
+        try:
+            # Check item existence
+            cursor.execute("SELECT COUNT(*) FROM items WHERE id = ?", (item_id,))
+            exists = cursor.fetchone()[0]  # Fetch the count
+            if not exists:
+                tmsg.showerror('Insert Wizard', f'The item \'{item_id}\' does not exist in the database')
+                return
 
-        # Object of Customer
-        customer = Customer(name, contact, item_id)
+            # Object of Customer
+            customer = Customer(name, contact, item_id)
 
-        # Update Item sell data
-        update(
-            'items',
-            'sell_date',
-            customer.purchase_date,
-            f'id = {item_id}'
-        )
+            # Update Item sell data
+            update(
+                'items',
+                'sell_date',
+                customer.purchase_date,
+                f'id = {item_id}'
+            )
 
-        # Add Customer
-        insert(
-            'customers',
-            Customer.header()[1:],
-            customer.data
-        )
+            # Add Customer
+            insert(
+                'customers',
+                Customer.header()[1:],
+                customer.data
+            )
 
-        # Display Message
-        tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
+            # Display Message
+            tmsg.showinfo('Insert Wizard', 'The data has been inserted successfully')
 
-        # Load data
-        self.master.load_treeview_data()
+            # Load data
+            self.master.load_treeview_data()
 
-        # Destroy the wizard window
-        self.destroy()
+            # Destroy the wizard window
+            self.destroy()
+        except sq.OperationalError:
+            tmsg.showerror('Insert Wizard', 'Please make sure you\'ve entered correct data')
 
     def __appearance(self) -> None:
         # Labels
-        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=0, column=0)
-        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=1, column=0)
-        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Insert Some Data', font='arial 15', bg='orange', fg='blue').grid(row=0, column=1)
+        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=3, column=0)
 
         # Entry
         self.entry_name = tk.Entry(self, textvariable=self.name, font='calibri 12')
-        self.entry_name.grid(row=0, column=1)
+        self.entry_name.grid(row=1, column=1)
 
         self.entry_contact = tk.Entry(self, textvariable=self.contact, font='calibri 12')
-        self.entry_contact.grid(row=1, column=1)
+        self.entry_contact.grid(row=2, column=1)
 
         self.entry_item_id = tk.Entry(self, textvariable=self.item_id, font='calibri 12')
-        self.entry_item_id.grid(row=2, column=1)
+        self.entry_item_id.grid(row=3, column=1)
 
         # Button
-        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data).grid(row=3, column=1)
+        tk.Button(self, text='Insert', font='arial 13', command=self.insert_data, bg='cyan', relief='groove').grid(row=4, column=1)
 
 
 ############################
@@ -392,8 +412,8 @@ class ItemUpdateWizard(tk.Toplevel):
         # Properties
         self.title('Item Wizard')
         self.iconbitmap('icon.ico')
-        self.width = 280
-        self.height = 170
+        self.width = 260
+        self.height = 190
         self.geometry(f'{self.width}x{self.height}')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
@@ -446,49 +466,53 @@ class ItemUpdateWizard(tk.Toplevel):
             data.append(detail)
             header.append(Item.header()[4])
 
-        # Update data
-        update(
-            'items',
-            header,
-            data,
-            condition
-        )
+        try:
+            # Update data
+            update(
+                'items',
+                header,
+                data,
+                condition
+            )
 
-        # Display Message
-        tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
+            # Display Message
+            tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
 
-        # Load data
-        self.master.load_treeview_data()
+            # Load data
+            self.master.load_treeview_data()
 
-        # Destroy the wizard window
-        self.destroy()
+            # Destroy the wizard window
+            self.destroy()
+        except sq.OperationalError:
+            tmsg.showerror('Update Wizard', 'Please make sure you\'ve entered correct data')
 
     def __appearance(self) -> None:
         # Labels
-        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=0, column=0)
-        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=1, column=0)
-        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=2, column=0)
-        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=3, column=0)
-        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=4, column=0)
+        tk.Label(self, text='Insert Some Data', font='arial 15', bg='orange', fg='blue').grid(row=0, column=1)
+        tk.Label(self, text='Type', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Company', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Price', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Detail', font='arial 12', fg='blue').grid(row=4, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=5, column=0)
 
         # Entry
         self.entry_type = tk.Entry(self, textvariable=self.type, font='calibri 12')
-        self.entry_type.grid(row=0, column=1)
+        self.entry_type.grid(row=1, column=1)
 
         self.entry_company = tk.Entry(self, textvariable=self.company, font='calibri 12')
-        self.entry_company.grid(row=1, column=1)
+        self.entry_company.grid(row=2, column=1)
 
         self.entry_price = tk.Entry(self, textvariable=self.price, font='calibri 12')
-        self.entry_price.grid(row=2, column=1)
+        self.entry_price.grid(row=3, column=1)
 
         self.entry_detail = tk.Entry(self, textvariable=self.detail, font='calibri 12')
-        self.entry_detail.grid(row=3, column=1)
+        self.entry_detail.grid(row=4, column=1)
 
         self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
-        self.entry_condition.grid(row=4, column=1)
+        self.entry_condition.grid(row=5, column=1)
 
         # Button
-        tk.Button(self, text='Update', font='arial 13', command=self.update_data).grid(row=5, column=1)
+        tk.Button(self, text='Update', font='arial 13', command=self.update_data, relief='groove', bg='orange').grid(row=6, column=1)
 
 
 ############################
@@ -501,8 +525,8 @@ class CustomerUpdateWizard(tk.Toplevel):
         # Properties
         self.title('Customer Wizard')
         self.iconbitmap('icon.ico')
-        self.width = 280
-        self.height = 170
+        self.width = 260
+        self.height = 160
         self.geometry(f'{self.width}x{self.height}')
         self.minsize(self.width, self.height)
         self.maxsize(self.width, self.height)
@@ -547,65 +571,208 @@ class CustomerUpdateWizard(tk.Toplevel):
             data.append(contact)
             header.append(Customer.header()[2])
         if isinstance(item_id, int):
-            if item_id > 0:
-                data.append(item_id)
-                header.append(Customer.header()[3])
-                has_item_id = True
+            data.append(item_id)
+            header.append(Customer.header()[3])
+            has_item_id = True
 
-        # Update data
-        if has_item_id:
-            # Update Item's sell date
-            date = get_current_datetime()
+        try:
+            # Update data
+            if has_item_id:
+                # Remove previous items' sell date
+                id = retrieve(
+                    'customers',
+                    ('item_id'),
+                    condition,
+                    True
+                )
+                # print(id)
+                if tmsg.askyesno('Update Wizard', f'Do you want to remove item sell date of id \'{id[0]}\'?'):
+
+                    # Change Sell Date
+                    update(
+                        'items',
+                        'sell_date',
+                        'None',
+                        f'id={id[0]}'
+                    )
+
+                # Update Item's sell date
+                date = get_current_datetime()
+                update(
+                    'items',
+                    'sell_date',
+                    date,
+                    f'id={item_id}'
+                )
+
+                # Append Purchase data
+                data.append(date)
+                header.append(Customer.header()[4])
+
+            # Update Customers' data
             update(
-                'items',
-                'sell_date',
-                date,
-                f'id={item_id}'
+                'customers',
+                header,
+                data,
+                condition
             )
 
-            # Append Purchase data
-            data.append(date)
-            header.append(Customer.header()[4])
+            # Display Message
+            tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
 
-        # Update Customers' data
-        update(
-            'customers',
-            header,
-            data,
-            condition
-        )
+            # Load data
+            self.master.load_treeview_data()
 
-        # Display Message
-        tmsg.showinfo('Update Wizard', 'The data has been updated successfully')
-
-        # Load data
-        self.master.load_treeview_data()
-
-        # Destroy the wizard window
-        self.destroy()
+            # Destroy the wizard window
+            self.destroy()
+        except sq.OperationalError:
+            tmsg.showerror('Update Wizard', 'Please make sure you\'ve entered correct data')
 
     def __appearance(self) -> None:
         # Labels
-        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=0, column=0)
-        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=1, column=0)
-        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=2, column=0)
-        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Insert Some Data', font='arial 15', bg='orange', fg='blue').grid(row=0, column=1)
+        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=4, column=0)
 
         # Entry
         self.entry_name = tk.Entry(self, textvariable=self.name, font='calibri 12')
-        self.entry_name.grid(row=0, column=1)
+        self.entry_name.grid(row=1, column=1)
 
         self.entry_contact = tk.Entry(self, textvariable=self.contact, font='calibri 12')
-        self.entry_contact.grid(row=1, column=1)
+        self.entry_contact.grid(row=2, column=1)
 
         self.entry_item_id = tk.Entry(self, textvariable=self.item_id, font='calibri 12')
-        self.entry_item_id.grid(row=2, column=1)
+        self.entry_item_id.grid(row=3, column=1)
 
         self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
-        self.entry_condition.grid(row=3, column=1)
+        self.entry_condition.grid(row=4, column=1)
 
         # Button
-        tk.Button(self, text='Update', font='arial 13', command=self.update_data).grid(row=4, column=1)
+        tk.Button(self, text='Update', font='arial 13', command=self.update_data, relief='groove', bg='orange').grid(row=5, column=1)
+
+
+############################
+# Item Remove Wizard
+############################
+class ItemRemoveWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Item Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 250
+        self.height = 100
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variable
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def remove_data(self) -> None:
+        """ Update data in database """
+        # Get Entry
+        condition: str = self.condition.get().strip()
+
+        if len(condition) > 0:
+            try:
+                # Remove
+                remove(
+                    'items',
+                    condition
+                )
+
+                # Message
+                tmsg.showinfo('Remove Wizard', f'Your data has been removed successfully on condition "{condition}".')
+
+                # Load data
+                self.master.load_treeview_data()
+
+                # Destroy the wizard window
+                self.destroy()
+            except sq.OperationalError:
+                tmsg.showerror('Remove Wizard', 'Please make sure you\'ve entered correct condition')
+        else:
+            tmsg.showerror('Remove Wizard', 'Please enter a condition to remove data.')
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Select Attributes to Remove', font='arial 15', fg='blue', bg='orange').grid(row=0, column=0, columnspan=2)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=1, column=0)
+
+        # Entry
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=1, column=1)
+
+        # Button
+        tk.Button(self, text='Remove', font='arial 13', command=self.remove_data, bg='red', relief='groove').grid(row=2, column=1)
+
+
+############################
+# Customer Remove Wizard
+############################
+class CustomerRemoveWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Customer Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 250
+        self.height = 100
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variable
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def remove_data(self) -> None:
+        """ Update data in database """
+        # Get Entry
+        condition: str = self.condition.get().strip()
+
+        if len(condition) > 0:
+            try:
+                # Remove
+                remove(
+                    'customers',
+                    condition
+                )
+
+                # Message
+                tmsg.showinfo('Remove Wizard', f'Your data has been removed successfully on condition "{condition}".')
+
+                # Load data
+                self.master.load_treeview_data()
+
+                # Destroy the wizard window
+                self.destroy()
+            except sq.OperationalError:
+                tmsg.showerror('Remove Wizard', 'Please make sure you\'ve entered correct condition')
+        else:
+            tmsg.showerror('Remove Wizard', 'Please enter a condition to remove data.')
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Select Attributes to Remove', font='arial 15', fg='blue', bg='orange').grid(row=0, column=0, columnspan=2)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=1, column=0)
+
+        # Entry
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=1, column=1)
+
+        # Button
+        tk.Button(self, text='Remove', font='arial 13', command=self.remove_data, bg='red', relief='groove').grid(row=2, column=1)
 
 
 ######################
@@ -623,8 +790,8 @@ class TreeviewWindow(tk.Tk):
         self.iconbitmap('icon.ico')
 
         # Attributes to show
-        self.items_attributes = Item.header()
-        self.customers_attributes = Customer.header()
+        self.items_attributes = list(Item.header())
+        self.customers_attributes = list(Customer.header())
 
         # Some Frames
         self.__frame_items = tk.Frame(self, padx=10, pady=10)
@@ -643,6 +810,10 @@ class TreeviewWindow(tk.Tk):
 
         # Set the appearance
         self.__appearance()
+
+    def remove_from_items_attributes(self, item: str) -> None:
+        """ Remove an attribute from items """
+        pass
 
     def __appearance(self) -> None:
         """ Set appearance """
@@ -693,10 +864,12 @@ class TreeviewWindow(tk.Tk):
         update_wizard.grab_set()
 
     def remove_items(self) -> None:
-        tmsg.showinfo('Action', 'The item has been removed successfully')
+        remove_wizard = ItemRemoveWizard(self)
+        remove_wizard.grab_set()
 
     def remove_customers(self) -> None:
-        tmsg.showinfo('Action', 'The customer has been removed successfully')
+        remove_wizard = CustomerRemoveWizard(self)
+        remove_wizard.grab_set()
 
     def filter_items(self) -> None:
         tmsg.showinfo('Filter', 'The items data has been filtered successfully')
@@ -718,8 +891,8 @@ class TreeviewWindow(tk.Tk):
 
         # Action Menu
         action_menu = tk.Menu(menu_bar, tearoff=0)
-        action_menu.add_command(label="Add Item", command=self.add_item)
-        action_menu.add_command(label="Add Customer", command=self.add_customer)
+        action_menu.add_command(label="Insert Item", command=self.add_item)
+        action_menu.add_command(label="Insert Customer", command=self.add_customer)
         action_menu.add_separator()
         action_menu.add_command(label="Update Item(s)", command=self.update_items)
         action_menu.add_command(label="Update Customer(s)", command=self.update_customers)
@@ -777,16 +950,16 @@ class TreeviewWindow(tk.Tk):
             self.__tree_customers.delete(row)
 
         # Fetch data
-        cursor.execute(f'SELECT * FROM items')
+        cursor.execute(f"SELECT {', '.join(self.items_attributes)} FROM items")
         for row in cursor.fetchall():
             self.__tree_items.insert('', 'end', values=row)
 
-        cursor.execute(f'SELECT * FROM customers')
+        cursor.execute(f"SELECT {', '.join(self.customers_attributes)} FROM customers")
         for row in cursor.fetchall():
             self.__tree_customers.insert('', 'end', values=row)
 
          # Message
-        tmsg.showinfo('Reload', 'The data has been reloaded successfully')
+        # tmsg.showinfo('Reload', 'The data has been reloaded successfully')
 
 
 ##################
