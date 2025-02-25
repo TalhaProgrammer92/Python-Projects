@@ -14,7 +14,7 @@ from PyMisc.system import authorized_mac
 # Authorization
 ########################
 if not authorized_mac('mac.txt'):
-    tmsg.showerror('Authorization', 'Your machine has not been authorized yet. Contact your software publisher/provider')
+    tmsg.showerror('Authorization', 'Your machine has not been authorized yet. Contact your software publisher/provider.')
     exit()
 
 
