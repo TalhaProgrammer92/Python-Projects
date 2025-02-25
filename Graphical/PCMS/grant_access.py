@@ -1,4 +1,4 @@
-from PyMisc.system import get_mac_address
+import uuid
 from os.path import exists, join
 from os import system as cmd
 from shlex import quote
@@ -20,7 +20,7 @@ try:
     path = join(path, 'mac.txt')
 
     # Get MAC address of the machine
-    mac: str = get_mac_address()
+    mac: str = ':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 2*6, 8)][::-1])
 
     # Save to file
     with open(path, 'w') as file:
