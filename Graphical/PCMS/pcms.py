@@ -7,6 +7,7 @@ from tkinter import ttk
 from os.path import join, splitext, exists
 from os import mkdir, listdir, startfile
 from datetime import datetime
+from sys import exit
 
 
 ########################
