@@ -17,6 +17,10 @@ path = 'mac.txt'
 if exists(path):
     with open(path, 'r') as file:
         mac_given: str = file.read()
+else:
+    tmsg.showerror('Unauthorized Access',
+                   'Your computer has no authorized access to run this software. Contact your software publisher/provider.')
+    exit()
 
 # Get system's MAC
 mac_system: str = ':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 2*6, 8)][::-1])
