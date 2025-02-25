@@ -845,8 +845,14 @@ class ItemFilterWizard(tk.Toplevel):
             # Message
             tmsg.showinfo('Filter Wizard', 'Your data has been filtered successfully')
         except sq.OperationalError:
-            tmsg.showerror('Filter Wizard', 'Please check your condition')
+            # Error Message
+            tmsg.showerror('Filter Wizard', f'You\'ve entered invalid condition. Your condition is "{self.master.items_condition}".')
+
+            # Reload Actual Attributes
             self.master.reload_items_attributes()
+
+            # Load data
+            self.master.load_treeview_data()
 
     def __appearance(self) -> None:
         # Labels
