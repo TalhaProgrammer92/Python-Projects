@@ -7,7 +7,7 @@ Introduction
 -----------------------------------------------------------------------------------------
 Welcome to DataBase Management Software! This software is designed to manage simple data.
 
-This document provides installation steps, usage instructions, and troubleshooting tips.
+This document provides usage instructions, and features.
 
 -----------------------------------------------------------------------------------------
 Features
@@ -16,23 +16,16 @@ Features
 - Remove: Remove existing data from database.
 - Update: Update existing data in the database.
 - Retrieve: Retrieve/Extract data from the database.
-- Save: Save records of the database
+- Save: Save records of the database in excel files.
 
 -----------------------------------------------------------------------------------------
 System Requirements
 -----------------------------------------------------------------------------------------
-Operating System: Windows 10/11 or Window 8.1
+Operating System: Windows 10/11/8.1
 
 RAM: 2GB minimum
 
 Storage: At least 100MB free space
-
------------------------------------------------------------------------------------------
-Installation Guide
------------------------------------------------------------------------------------------
-1. Extract the software folder to your desired location.
-2. Run the activator and enter location where your installed your software.
-3. Run the software.
 
 -----------------------------------------------------------------------------------------
 Usage
@@ -58,7 +51,7 @@ talha.code92@gmail.com.
 -----------------------------------------------------------------------------------------
 License
 -----------------------------------------------------------------------------------------
-DataBase Management Software is licensed under EULA. See `LICENSE.docx` file for details.
+DataBase Management Software is licensed under EULA. See `LICENSE.pdf` file for details.
 
 
 Thank you for using DataBase Management Software! 🚀
