@@ -1,4 +1,4 @@
-import os.path
+# import os.path
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
@@ -7,6 +7,15 @@ from tkinter import ttk
 from os.path import join, splitext, exists
 from os import mkdir, listdir, startfile
 from datetime import datetime
+from PyMisc.system import authorized_mac
+
+
+########################
+# Authorization
+########################
+if not authorized_mac('mac.txt'):
+    tmsg.showerror('Authorization', 'Your machine has not been authorized yet. Contact your software publisher/provider')
+    exit()
 
 
 ########################
