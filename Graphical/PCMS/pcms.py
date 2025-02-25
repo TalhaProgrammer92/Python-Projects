@@ -1,4 +1,4 @@
-# import os.path
+import uuid
 import tkinter as tk
 import tkinter.messagebox as tmsg
 import sqlite3 as sq
@@ -13,10 +13,19 @@ from PyMisc.system import authorized_mac
 ########################
 # Authorization
 ########################
-if not authorized_mac('mac.txt'):
-    tmsg.showerror('Unauthorized Access', 'Your machine has not been authorized yet. Contact your software publisher/provider.')
-    exit()
+# Get given MAC address
+path = 'mac.txt'
+if exists(path):
+    with open(path, 'r') as file:
+        mac_given: str = file.read()
 
+# Get system's MAC
+mac_system: str = ':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 2*6, 8)][::-1])
+
+# Check MAC address
+if mac_system != mac_given:
+   tmsg.showerror('Unauthorized Access', 'Your computer has no authorized access to run this software. Contact your software publisher/provider.')
+   exit()
 
 ########################
 # Database - Global
@@ -1202,18 +1211,7 @@ class TreeviewWindow(tk.Tk):
 
 
 ##################
-# Testing
+# Proceed
 ##################
-if __name__ == '__main__':
-    # item: Item = Item('Laptop', 'Lenovo', 25000, 'i5 4th Generation')
-    # customer: Customer = Customer('Talha Ahmad', '+92 331 4650460', 1)
-    # item.sell_date = customer.purchase_date
-
-    # Insert data
-    # insert('items', Item.header()[1:], item.data)
-    # insert('customers', Customer.header()[1:], customer.data)
-
-    win = TreeviewWindow()
-    win.mainloop()
-
-    pass
+win = TreeviewWindow()
+win.mainloop()
