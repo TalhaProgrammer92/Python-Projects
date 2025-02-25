@@ -887,6 +887,108 @@ class ItemFilterWizard(tk.Toplevel):
         tk.Button(self, text='Filter', font='arial 13', command=self.filter_data, bg='green', relief='groove').grid(row=7, column=1)
 
 
+############################
+# Customer Filter Wizard
+############################
+class CustomerFilterWizard(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Properties
+        self.title('Customer Wizard')
+        self.iconbitmap('icon.ico')
+        self.width = 280
+        self.height = 220
+        self.geometry(f'{self.width}x{self.height}')
+        self.minsize(self.width, self.height)
+        self.maxsize(self.width, self.height)
+
+        # Entry Variable
+        self.name = tk.BooleanVar()
+        self.contact = tk.BooleanVar()
+        self.item_id = tk.BooleanVar()
+        self.purchase_date = tk.BooleanVar()
+        self.condition = tk.StringVar()
+
+        # Function call
+        self.__appearance()
+
+    def filter_data(self) -> None:
+        """ Filter data in database """
+        # Reload Actual Attributes
+        self.master.reload_customers_attributes()
+
+        # Filter Attributes
+        if not self.name.get() and Customer.header()[1] in self.master.items_attributes:
+            self.master.customers_attributes.remove(Customer.header()[1])
+        elif Customer.header()[1] not in self.master.customers_attributes:
+            self.master.customers_attributes.append(Customer.header()[1])
+
+        if not self.contact.get() and Customer.header()[2] in self.master.customers_attributes:
+            self.master.customers_attributes.remove(Customer.header()[2])
+        elif Customer.header()[2] not in self.master.customers_attributes:
+            self.master.customers_attributes.append(Customer.header()[2])
+
+        if not self.item_id.get() and Customer.header()[3] in self.master.customers_attributes:
+            self.master.customers_attributes.remove(Customer.header()[3])
+        elif Customer.header()[3] not in self.master.customers_attributes:
+            self.master.customers_attributes.append(Customer.header()[3])
+
+        if not self.purchase_date.get() and Customer.header()[4] in self.master.customers_attributes:
+            self.master.customers_attributes.remove(Customer.header()[4])
+        elif Customer.header()[4] not in self.master.items_attributes:
+            self.master.customers_attributes.append(Customer.header()[4])
+
+        self.master.customers_condition = self.condition.get().strip()
+
+        try:
+            # Load data
+            self.master.load_treeview_data()
+
+            # Destroy the wizard window
+            self.destroy()
+
+            # Message
+            tmsg.showinfo('Filter Wizard', 'Your data has been filtered successfully')
+        except sq.OperationalError:
+            # Error Message
+            tmsg.showerror('Filter Wizard', f'You\'ve entered invalid condition. Your condition is "{self.master.customers_condition}".')
+
+            # Reload Actual Attributes
+            self.master.reload_customers_attributes()
+
+            # Load data
+            self.master.load_treeview_data()
+
+    def __appearance(self) -> None:
+        # Labels
+        tk.Label(self, text='Select Attributes to Filter', font='arial 15', fg='blue', bg='orange').grid(row=0, column=0, columnspan=2)
+        tk.Label(self, text='Name', font='arial 12', fg='blue').grid(row=1, column=0)
+        tk.Label(self, text='Contact', font='arial 12', fg='blue').grid(row=2, column=0)
+        tk.Label(self, text='Item Id', font='arial 12', fg='blue').grid(row=3, column=0)
+        tk.Label(self, text='Purchase Date', font='arial 12', fg='blue').grid(row=4, column=0)
+        tk.Label(self, text='Condition', font='arial 12', fg='blue').grid(row=5, column=0)
+
+        # Entry
+        self.check_name = tk.Checkbutton(self, variable=self.name, font='calibri 12')
+        self.check_name.grid(row=1, column=1)
+
+        self.check_contact = tk.Checkbutton(self, variable=self.contact, font='calibri 12')
+        self.check_contact.grid(row=2, column=1)
+
+        self.check_item_id = tk.Checkbutton(self, variable=self.item_id, font='calibri 12')
+        self.check_item_id.grid(row=3, column=1)
+
+        self.check_purchase_date = tk.Checkbutton(self, variable=self.purchase_date, font='calibri 12')
+        self.check_purchase_date.grid(row=4, column=1)
+
+        self.entry_condition = tk.Entry(self, textvariable=self.condition, font='calibri 12')
+        self.entry_condition.grid(row=5, column=1)
+
+        # Button
+        tk.Button(self, text='Filter', font='arial 13', command=self.filter_data, bg='green', relief='groove').grid(row=6, column=1)
+
+
 ######################
 # Treeview Window
 ######################
@@ -996,7 +1098,8 @@ class TreeviewWindow(tk.Tk):
         filter_wizard.grab_set()
 
     def filter_customers(self) -> None:
-        tmsg.showinfo('Filter', 'The customers data has been filtered successfully')
+        filter_wizard = CustomerFilterWizard(self)
+        filter_wizard.grab_set()
 
     def create_menus(self) -> None:
         """ To create menus and sub-menus """
