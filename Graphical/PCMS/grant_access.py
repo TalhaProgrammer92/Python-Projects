@@ -34,3 +34,5 @@ try:
 except Exception as e:
     # Exception prompt message
     print(f'Something went wrong!\nDebug: {e}')
+
+a = input('\nPress \'Enter\' key to exit...')
