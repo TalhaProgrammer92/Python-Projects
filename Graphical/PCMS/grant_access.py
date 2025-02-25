@@ -9,7 +9,7 @@ try:
 
     # Get Path
     while True:
-        path = input('Enter path of your software file: ')
+        path: str = input('Enter path of your software file: ')
         if len(path) == 0:
             exit()
         if exists(path):
@@ -25,9 +25,10 @@ try:
         file.write(mac)
 
     # Hide the file
-    cmd(f'Attrib +h +r +s \'{path}\'')
+    cmd(f'Attrib +h +r +s {path}')
 
     # Result
     print('Access Granted! Now you can run your software')
 except Exception as e:
+    # Exception prompt message
     print(f'Something went wrong!\nDebug: {e}')
