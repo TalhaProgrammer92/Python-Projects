@@ -35,11 +35,38 @@ class position:
 
 
 ################
+# Resolution
+################
+class resolution:
+    def __init__(self, width: int, height: int):
+        self.__width: int = width
+        self.__height: int = height
+
+    @property
+    def width(self) -> int:
+        return self.__width
+
+    @property
+    def height(self) -> int:
+        return self.__height
+
+    @property
+    def both(self) -> int:
+        return self.width, self.height
+
+    def area(self) -> int:
+        return self.width * self.height
+
+    def __repr__(self) -> str:
+        return '{}x{}'.format(self.width, self.height)
+
+
+################
 # Size
 ################
 class size(position):
-    def __init__(self, height: int, width: int):
-        super().__init__(height, width)
+    def __init__(self, row: int, column: int):
+        super().__init__(row, column)
 
     @property
     def area(self) -> constant.value:
