@@ -26,3 +26,5 @@ class MainWindow(tk.Tk):
         # Title
         self.title("Number System")
 
+        # Variables
+
