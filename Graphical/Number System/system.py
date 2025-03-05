@@ -50,9 +50,19 @@ class MainWindow(tk.Tk):
         entry: str = self.entry.get().strip()
 
         if len(entry) > 0:
+            # Error - Unsupported floating point number
+            if '.' in entry:
+                # Messagebox
+                tmsg.showerror('Float Error', 'Floating point numbers are not supported.')
+
+                # Reset the entry
+                self.entry.set("")
+                return
+
             # Reset the entry
             self.entry.set("")
         else:
+            # Messagebox
             tmsg.showerror("Value Error", "You must enter a value before performing any conversion operation")
 
     def __appearance(self) -> None:
