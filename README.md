@@ -37,4 +37,4 @@ Please ensure your contributions adhere to the existing code style and include a
 
 ## Contact 📞
 
-You can contact me via email at [talha.code92@gmail.com](mailto:talha.code92@gmail.com) or through my GitHub profile: [Talha Programmer 92](https://github.com/TalhaProgrammer92).
+You can contact me via email at [talha.code92@gmail.com](mailto:talha.code92@gmail.com) or through my GitHub profile: [Talha Ahmad](https://github.com/TalhaProgrammer92).
