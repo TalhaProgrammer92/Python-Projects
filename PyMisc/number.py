@@ -99,15 +99,12 @@ def convert_to_base(number: Decimal, base: int) -> Custom:
         value = int(value / base)
     return Custom(result, base)
 
-def convert_from_base(number: Custom | Octal | Binary | HexaDecimal, base: int) -> Decimal:
+def convert_from_base(number: Custom | Octal | Binary | HexaDecimal) -> Decimal:
     """ Convert a number from any base (2-16) to decimal """
-    if base < 2:
-        raise ValueError("Base must be greater than or equal to 2")
-    
     result: int = 0
     value: str = number.value
     for digit in value:
-        result = result * base + LEGALS.index(digit)
+        result += result * number.base + LEGALS.index(digit)
     return Decimal(result)
 
 

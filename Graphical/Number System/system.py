@@ -59,6 +59,9 @@ class MainWindow(tk.Tk):
                 self.entry.set("")
                 return
 
+            # Conversion
+            pass
+
             # Reset the entry
             self.entry.set("")
         else:
