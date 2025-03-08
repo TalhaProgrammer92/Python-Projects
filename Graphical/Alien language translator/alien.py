@@ -1,5 +1,5 @@
 import random
-import unicodedata
+# import unicodedata
 
 def get_valid_unicode():
     """ Function to generate a unique unicode character """
@@ -11,15 +11,18 @@ def get_valid_unicode():
 
     while True:
         # Generate a random Unicode character
-        unicode_value = random.choice(range(0x2000, 0x3000))
-        unicode_char = chr(unicode_value)  # General Punctuation, Symbols
+        unicode_code = random.choice(range(0x2000, 0x3000))
+        unicode_char = chr(unicode_code)  # General Punctuation, Symbols
 
 
         # Check if it falls within restricted ranges
         if not any(start <= ord(unicode_char) <= end for start, end in restricted_ranges):
-            return unicode_char, unicode_value
+            return unicode_char, unicode_code
         else:
             return get_valid_unicode()
+
+# Checks validity of a unicode character depending on it's given code
+is_valid_unicode = lambda unicode_character, unicode_code: unicode_character == chr(unicode_code)
 
 
 #############################
@@ -44,16 +47,16 @@ class UnicodeDictionary:
         return self.__unicode_code
 
     def __repr__(self) -> str:
-        return '{} {} {}'.format(self.keyboard_character, self.unicode_character, self.unicode_code)
+        return '{} {} {} {}'.format(self.keyboard_character, self.unicode_character, self.unicode_code, is_valid_unicode(self.__unicode_character, self.unicode_code))
 
 
 ############################
-# Tuples - Unicode Map
+# Unicode Mapping
 ############################
 # Pre-defined Tuples
-keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~')
-unicode_characters: tuple = ('⠮', '☮', '⨙', '⌖', '⠽')
-unicode_codes: tuple = (10286, 9774, 10777, 8982, 10301)
+keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ')
+unicode_characters: tuple = ('⠮', '☮', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻')
+unicode_codes: tuple = (10286, 9774, 10777, 8982, 10301, 8871, 10391, 8955)
 
 # The empty unicode dictionary list
 unicode_dictionary: list[UnicodeDictionary] = []
@@ -109,21 +112,21 @@ e (done)
 >>>> ⨂ 10754 N-ARY CIRCLED TIMES OPERATOR
 >>>> ⠽ 10301 BRAILLE PATTERN DOTS-13456
 
-f
+f (done)
 >>>> ⊧ 8871 MODELS
 >>>> ⿖ 12246 Unknown Character
 >>>> ⡄ 10308 BRAILLE PATTERN DOTS-37
 >>>> ⲱ 11441 COPTIC SMALL LETTER OOU
 >>>> ⥙ 10585 DOWNWARDS HARPOON WITH BARB LEFT TO BAR
 
-g
+g (done)
 >>>> ⢗ 10391 BRAILLE PATTERN DOTS-12358
 >>>> ⶱ 11697 ETHIOPIC SYLLABLE ZZU
 >>>> ⃁ 8385 Unknown Character
 >>>> ┑ 9489 BOX DRAWINGS DOWN LIGHT AND LEFT HEAVY
 >>>> ⑬ 9324 CIRCLED NUMBER THIRTEEN
 
-h
+h (done)
 >>>> ≌ 8780 ALL EQUAL TO
 >>>> ⋻ 8955 CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
 >>>> ⨀ 10752 N-ARY CIRCLED DOT OPERATOR
