@@ -25,29 +25,44 @@ def get_valid_unicode():
 is_valid_unicode = lambda unicode_character, unicode_code: unicode_character == chr(unicode_code)
 
 
+#################
+# Character
+#################
+class UnicodeCharacter:
+    def __init__(self, character: str, code: int):
+        self.__character: str = character
+        self.__code: int = code
+
+    @property
+    def character(self) -> str:
+        return self.__character
+
+    @property
+    def code(self) -> int:
+        return self.__code
+
+    def __repr__(self) -> str:
+        return '{} {} {}'.format(self.character, self.code, is_valid_unicode(self.character, self.code))
+
+
 #############################
 # My custom dictionary
 #############################
 class UnicodeDictionary:
-    def __init__(self, keyboard_character: str, unicode_character: str, unicode_code: int):
-        self.__keyboard_character: str = keyboard_character
-        self.__unicode_character: str = unicode_character
-        self.__unicode_code: int = unicode_code
+    def __init__(self, keyboard: UnicodeCharacter, alien: UnicodeCharacter):
+        self.__keyboard: UnicodeCharacter = keyboard
+        self.__alien: UnicodeCharacter = alien
 
     @property
-    def keyboard_character(self) -> str:
-        return self.__keyboard_character
+    def keyboard(self) -> UnicodeCharacter:
+        return self.__keyboard
 
     @property
-    def unicode_character(self) -> str:
-        return self.__unicode_character
-
-    @property
-    def unicode_code(self) -> int:
-        return self.__unicode_code
+    def alien(self) -> UnicodeCharacter:
+        return self.__alien
 
     def __repr__(self) -> str:
-        return '{} {} {} {}'.format(self.keyboard_character, self.unicode_character, self.unicode_code, is_valid_unicode(self.__unicode_character, self.unicode_code))
+        return '{} | {}'.format(self.keyboard.__repr__(), self.alien.__repr__())
 
 
 ############################
@@ -55,16 +70,28 @@ class UnicodeDictionary:
 ############################
 # Pre-defined Tuples
 keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ')
-unicode_characters: tuple = ('⠮', '☮', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻')
-unicode_codes: tuple = (10286, 9774, 10777, 8982, 10301, 8871, 10391, 8955)
+keyboard_codes: tuple = (97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126, 32)
+alien_characters: tuple = ('⠮', '☮', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻')
+alien_codes: tuple = (10286, 9774, 10777, 8982, 10301, 8871, 10391, 8955)
 
 # The empty unicode dictionary list
 unicode_dictionary: list[UnicodeDictionary] = []
 
 # Append objects to the list of unicode dictionary
-limit: int = min(len(keyboard_characters), len(unicode_characters), len(unicode_codes))     # Get smallest tuple's length among above three predefiend tuples to prevent index overflow exception.
+limit: int = min(len(keyboard_characters), len(keyboard_codes), len(alien_characters), len(alien_codes))     # Get smallest tuple's length among above three predefiend tuples to prevent index overflow exception.
 for i in range(limit):
-    unicode_dictionary.append(UnicodeDictionary(keyboard_characters[i], unicode_characters[i], unicode_codes[i]))
+    unicode_dictionary.append(
+        UnicodeDictionary(
+            keyboard=UnicodeCharacter(
+                keyboard_characters[i],
+                keyboard_codes[i]
+            ),
+            alien=UnicodeCharacter(
+                alien_characters[i],
+                alien_codes[i]
+            )
+        )
+    )
 
 
 if __name__ == '__main__':
