@@ -70,7 +70,7 @@ class UnicodeDictionary:
 # Unicode Mapping
 ############################
 # Pre-defined Tuples
-keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ')
+keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~')
 keyboard_codes: tuple = (97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126, 32)
 alien_characters: tuple = ('⠮', '☮', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻', '⸶', '⪂', 'Ⳮ', '⎎', '⌊', '┘', '☶', '⣗', '⚍', '⅛', '⺉', '⧢', '⧤', '⦟', '⪠', '⠟', '⺮', '⣓')
 alien_codes: tuple = (10286, 9774, 10777, 8982, 10301, 8871, 10391, 8955, 11830, 10882, 11501, 9102, 8970, 9496, 9782, 10455, 9869, 8539, 11913, 10722, 10724, 10655, 10912, 10271, 11950, 10451)
@@ -94,11 +94,10 @@ for i in range(limit):
         )
     )
 
-def get_alien_character(character: str) -> int:
+def get_alien_character(character: str) -> str:
     """ Get corresponding alien text in unicode_dictionary """
-    for dict_ in unicode_dictionary:
-        if dict_.keyboard.character == character:
-            return dict_.alien.character
+    index: int = keyboard_characters.index(character)
+    return unicode_dictionary[index].alien.character
 
 def convert_to_alien(message: str) -> str:
     """ Converts human text to alien like text """
@@ -106,7 +105,7 @@ def convert_to_alien(message: str) -> str:
     for character in message:
         if character == ' ':
             alien += ' '
-        elif character in string.ascii_letters + string.digits + string.punctuation:
+        elif character in keyboard_characters:
             alien += get_alien_character(character)
         else:
             raise ValueError(str(f'Invalid character found {character} having unicode {ord(character)}'))
@@ -124,6 +123,10 @@ if __name__ == '__main__':
     #         unicode, value = get_valid_unicode()
     #         print('>'*4, unicode, value, unicodedata.name(unicode, "Unknown Character"))
     #     print()
-    print_unicode_dictionary()
+    # print_unicode_dictionary()
 
-    # print(convert_to_alien('My name is Talha Ahmad'.lower()))
+    print(convert_to_alien('it is not raining today'))
+    print(convert_to_alien('my name is talha ahmad'))
+    print(convert_to_alien('i love to code in python'))
+    print(convert_to_alien('he love x man series'))
+    print(convert_to_alien('the quick brown fox jumps over a lazy dog'))
