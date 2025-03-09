@@ -128,5 +128,5 @@ if __name__ == '__main__':
     print(convert_to_alien('it is not raining today'))
     print(convert_to_alien('my name is talha ahmad'))
     print(convert_to_alien('i love to code in python'))
-    print(convert_to_alien('he love x man series'))
+    print(convert_to_alien('he loves x man series'))
     print(convert_to_alien('the quick brown fox jumps over a lazy dog'))
