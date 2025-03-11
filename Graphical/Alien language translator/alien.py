@@ -22,7 +22,7 @@ def get_valid_unicode():
         else:
             return get_valid_unicode()
 
-# Checks validity of a unicode character depending on it's given code
+# Checks validity of a Unicode character depending on it's given code
 is_valid_unicode = lambda unicode_character, unicode_code: unicode_character == chr(unicode_code)
 
 
@@ -72,14 +72,14 @@ class UnicodeDictionary:
 # Pre-defined Tuples
 keyboard_characters: tuple = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ')
 keyboard_codes: tuple = (97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126, 32)
-alien_characters: tuple = ('⠮', '⼺', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻', '⸶', '⪂', 'Ⳮ', '⎎', '⌊', '┘', '☶', '⣗', '⚍', '⅛', '⺉', '⧢', '⧤', '⦟', '⪠', '⠟', '⺮', '⣓', 'Ⱨ', 'ℜ', '⡉', '⺕', '∋', '⠰', '⺢')
-alien_codes: tuple = (10286, 12090, 10777, 8982, 10301, 8871, 10391, 8955, 11830, 10882, 11501, 9102, 8970, 9496, 9782, 10455, 9869, 8539, 11913, 10722, 10724, 10655, 10912, 10271, 11950, 10451, 11367, 8476, 10313, 11925, 8715, 10288, 11938)
+alien_characters: tuple = ('⠮', '⼺', '⨙', '⌖', '⠽', '⊧', '⢗', '⋻', '⸶', '⪂', 'Ⳮ', '⎎', '⌊', '┘', '☶', '⣗', '⚍', '⅛', '⺉', '⧢', '⧤', '⦟', '⪠', '⠟', '⺮', '⣓', 'Ⱨ', 'ℜ', '⡉', '⺕', '∋', '⠰', '⺢', '⟣', '⣋')
+alien_codes: tuple = (10286, 12090, 10777, 8982, 10301, 8871, 10391, 8955, 11830, 10882, 11501, 9102, 8970, 9496, 9782, 10455, 9869, 8539, 11913, 10722, 10724, 10655, 10912, 10271, 11950, 10451, 11367, 8476, 10313, 11925, 8715, 10288, 11938, 10211, 10443)
 
 # The empty unicode dictionary list
 unicode_dictionary: list[UnicodeDictionary] = []
 
 # Append objects to the list of unicode dictionary
-limit: int = min(len(keyboard_characters), len(keyboard_codes), len(alien_characters), len(alien_codes))     # Get smallest tuple's length among above three pre-defiend tuples to prevent index overflow exception.
+limit: int = min(len(keyboard_characters), len(keyboard_codes), len(alien_characters), len(alien_codes))     # Get smallest tuple's length among above three pre-defined tuples to prevent index overflow exception.
 for i in range(limit):
     unicode_dictionary.append(
         UnicodeDictionary(
