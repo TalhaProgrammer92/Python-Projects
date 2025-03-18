@@ -129,9 +129,8 @@ if __name__ == '__main__':
     #         print('>'*4, unicode, value, unicodedata.name(unicode, "Unknown Character"))
     #     print()
     print_unicode_dictionary()
-    print("\nUnique:", is_unique())
+    # print("\nUnique:", is_unique())
 
-    # print(convert_to_alien('it is not raining today'))
     # print(convert_to_alien('my name is talha ahmad'))
     # print(convert_to_alien('i love to code in python'))
     # print(convert_to_alien('he loves x man series'))
