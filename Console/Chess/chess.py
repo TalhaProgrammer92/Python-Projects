@@ -82,9 +82,9 @@ class ChessBoard:
 
 
 ########################
-# Level - Class
+# Game - Class
 ########################
-class Level:
+class Game:
     def __init__(self, board: ChessBoard):
         self.__chess_board: ChessBoard = board
         self.__white_pieces: list = []
@@ -148,6 +148,6 @@ if __name__ == '__main__':
     board = ChessBoard()
     # board.display()
 
-    game = Level(board)
+    game = Game(board)
     game.initialize_pieces()
     game.board.display()
