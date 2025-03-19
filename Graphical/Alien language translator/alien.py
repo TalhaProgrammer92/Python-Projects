@@ -103,7 +103,7 @@ def convert_to_alien(message: str) -> str:
     """ Converts human text to alien like text """
     alien: str = ''
     for character in message:
-        if character in keyboard_characters:
+        if character in keyboard_characters[:limit]:
             alien += get_alien_character(character)
         else:
             alien += character
@@ -128,9 +128,10 @@ if __name__ == '__main__':
     #         unicode, value = get_valid_unicode()
     #         print('>'*4, unicode, value, unicodedata.name(unicode, "Unknown Character"))
     #     print()
-    print_unicode_dictionary()
+    # print_unicode_dictionary()
     # print("\nUnique:", is_unique())
 
+    print(convert_to_alien("cout << i :: array;"))
     # print(convert_to_alien('my name is talha ahmad'))
     # print(convert_to_alien('i love to code in python'))
     # print(convert_to_alien('he loves x man series'))
