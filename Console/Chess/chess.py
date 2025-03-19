@@ -70,7 +70,7 @@ class ChessPiece:
 ########################
 class ChessBoard:
     def __init__(self):
-        self.grid = [[" " for _ in range(8)] for _ in range(8)]
+        self.grid = [["-" for _ in range(8)] for _ in range(8)]
 
     def display(self):
         print("    a   b   c   d   e   f   g   h")  # Column labels
