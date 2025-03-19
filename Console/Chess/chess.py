@@ -1,7 +1,7 @@
 ######################
 # Game variables
 ######################
-chess_piece: dict = {
+chess_pieces_dictionary: dict = {
     'black' : {
         'king' : '\u2654',
         'queen' : '\u2655',
@@ -22,6 +22,50 @@ chess_piece: dict = {
 
 
 #################
+# Position
+#################
+class Position:
+    def __init__(self, row: int, column: int):
+        self.row: int = row
+        self.column: int = column
+
+    def __repr__(self) -> str:
+        return '({}, {})'.format(self.row, self.column)
+
+
+#################
+# ChessPiece
+#################
+class ChessPiece:
+    def __init__(self, name: str, group: str, initial_position: Position = Position(0, 0)):
+        self.__group: str = group
+        self.__name: str = name
+        self.__code: str = chess_pieces_dictionary[group][name]
+        self.position: Position = initial_position
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def code(self) -> str:
+        return self.__code
+
+    @property
+    def group(self) -> str:
+        return self.__group
+
+    def change(self, name: str) -> None:
+        """ Change the pawn piece to other """
+        if self.__name == 'pawn' and name not in ['pawn', 'king']:
+            self.__name = name
+            self.__code = chess_pieces_dictionary[self.__group][name]
+
+    def __repr__(self) -> str:
+        return self.__code
+
+
+#################
 # Functions
 #################
 def print_all_chess_pieces() -> None:
@@ -29,7 +73,7 @@ def print_all_chess_pieces() -> None:
     for _class in ['white', 'black']:
         print(_class.upper() + ':', end='\t')
         for piece in ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn']:
-            print(chess_piece[_class][piece], end=' ')
+            print(chess_pieces_dictionary[_class][piece], end=' ')
         print()
 
 
@@ -37,4 +81,8 @@ def print_all_chess_pieces() -> None:
 # Testing
 #################
 if __name__ == '__main__':
-    print_all_chess_pieces()
+    # print_all_chess_pieces()
+    piece = ChessPiece('pawn', 'white')
+    print(piece, piece.position)
+    piece.change('knight')
+    print(piece, piece.position)
