@@ -73,12 +73,12 @@ class ChessBoard:
         self.grid = [[" " for _ in range(8)] for _ in range(8)]
 
     def display(self):
-        print("  a   b   c   d   e   f   g   h")  # Column labels
-        print(" +" + "---+" * 8)  # Top border
+        print("    a   b   c   d   e   f   g   h")  # Column labels
+        print("  +" + "---+" * 8)  # Top border
 
-        for i, row in enumerate(self.grid, start=1):  # Change `self.Sgrid` → `self.grid`
-            print(f"{9 - i}| " + " | ".join(row) + " |")  # Row number + board row
-            print(" +" + "---+" * 8)  # Row separator
+        for i, row in enumerate(self.grid, start=1):
+            print(f"{9 - i} | " + " | ".join(row) + " |")  # Row number + board row
+            print("  +" + "---+" * 8)  # Row separator
 
 
 ########################
