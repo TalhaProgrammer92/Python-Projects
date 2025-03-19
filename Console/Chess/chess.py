@@ -21,9 +21,9 @@ chess_pieces_dictionary: dict = {
 }
 
 
-#################
-# Position
-#################
+########################
+# Position - Class
+########################
 class Position:
     def __init__(self, row: int, column: int):
         self.row: int = row
@@ -33,9 +33,9 @@ class Position:
         return '({}, {})'.format(self.row, self.column)
 
 
-#################
-# ChessPiece
-#################
+########################
+# Chess Piece - Class
+########################
 class ChessPiece:
     def __init__(self, name: str, group: str, initial_position: Position = Position(0, 0)):
         self.__group: str = group
@@ -85,4 +85,6 @@ if __name__ == '__main__':
     piece = ChessPiece('pawn', 'white')
     print(piece, piece.position)
     piece.change('knight')
+    piece.position.row = 2
+    piece.position.column = 3
     print(piece, piece.position)
