@@ -132,7 +132,6 @@ if __name__ == '__main__':
         '\nLeft:', len(keyboard_characters) - limit
     )
 
-    # print(convert_to_alien("cout << i :: array;"))
     # print(convert_to_alien('my name is talha ahmad'))
     # print(convert_to_alien('i love to code in python'))
     # print(convert_to_alien('he loves x man series'))
