@@ -123,10 +123,10 @@ class Position:
 # Symbol Class
 ########################
 class Symbol:
-    def __init__(self, unicode: str, color_property: clr.property, position: Position):
+    def __init__(self, unicode: str, color_property: clr.property, position: Position = None):
         self.unicode: str = unicode
         self.color: clr.property = color_property
-        self.position: Position = position
+        self.position: Position | None = position
 
     # Method to get empty symbol
     @staticmethod
@@ -170,10 +170,33 @@ class Board:
     # Method to display board
     def display(self) -> None:
         """ This method display the entire board """
+        # Variables
+        gap: str = ' ' * 2
+
+        column_separator: Symbol = Symbol('|', clr.property(clr.foreground.magenta()))
+        row_seperator: Symbol = Symbol(gap + '---------------------------------', clr.property(clr.foreground.magenta()))
+
+        num: int = 1
+
+        # Numbers Strip - Horizontal
+        print(gap, end='')
+
         for i in range(8):
-            for j in range(8):
-                print(self.__board[i][j], end=' ')
-            print()
+            print(f"{gap}{Symbol(str(i + 1), clr.property(clr.foreground.yellow())).__repr__()} ", end='')
+
+        print()
+
+        # Display loop
+        print(row_seperator)
+        for row in self.__board:
+            # Numbers Strip - Vertical
+            print(Symbol(str(num), clr.property(clr.foreground.yellow())), column_separator, end='')
+
+            for cell in row:
+                print(" ", cell, " ", column_separator, end='', sep='')
+            print('\n', row_seperator, sep='')
+
+            num += 1
 
 
 ########################
