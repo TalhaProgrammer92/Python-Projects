@@ -1,18 +1,7 @@
 import PyMisc.color as clr
 import os
 import time
-
-########################
-# Symbol Class
-########################
-class Symbol:
-    def __init__(self, unicode: str, color_property: clr.property):
-        self.unicode: str = unicode
-        self.color: clr.property = color_property
-
-    # Representation Method
-    def __repr__(self) -> str:
-        return clr.get_colored(self.unicode, self.color)
+import unicode
 
 
 ########################
@@ -80,3 +69,106 @@ class Score:
     # Representation method
     def __repr__(self) -> str:
         return str(self.__score)
+
+
+########################
+# Player Class
+########################
+class Player:
+    def __init__(self, name: Name):
+        self.name: Name = name
+        self.score: Score = Score()
+
+    # Representation method
+    def __repr__(self) -> str:
+        return self.name.__repr__() + '\t' + self.score.__repr__()
+
+
+########################
+# Position Class
+########################
+class Position:
+    def __init__(self, row: int, column: int):
+        self.__row: int = row
+        self.__column: int = column
+
+    # Getters
+    @property
+    def row(self) -> int:
+        return self.__row
+
+    @property
+    def column(self) -> int:
+        return self.__column
+
+    # Setters
+    @row.setter
+    def row(self, value: int):
+        self.__row = value if value >= 0 else self.row
+
+    @column.setter
+    def column(self, value: int):
+        self.__column = value if value >= 0 else self.column
+
+    # Overloaded method for subtraction
+    def __sub__(self, other):
+        return Position(abs(self.row - other.row), abs(self.column - other.column))
+
+    # Representation method
+    def __repr__(self) -> str:
+        return f"({self.row}, {self.column})"
+
+
+########################
+# Symbol Class
+########################
+class Symbol:
+    def __init__(self, unicode: str, color_property: clr.property):
+        self.unicode: str = unicode
+        self.color: clr.property = color_property
+
+    # Method to get empty symbol
+    @staticmethod
+    def getEmptyCell(position: Position):
+        """ This method generates symbol object for empty board cell dynamically based on given position """
+        _, __ = [unicode.SYMBOL['empty-white'], unicode.SYMBOL['empty-black']], [clr.property(clr.foreground.bright_cyan()), clr.property(clr.foreground.bright_blue())]
+
+        index: int = (position.row + position.column) % 2
+
+        return Symbol(_[index], __[index])
+
+    # Representation Method
+    def __repr__(self) -> str:
+        return clr.get_colored(self.unicode, self.color)
+
+
+########################
+# Board Class
+########################
+class Board:
+    def __init__(self):
+        self.__board: list = []
+
+    # Method to clear board
+    def clear(self) -> None:
+        """ This method clears entire board """
+        # If board is an empty list
+        if len(self.__board) == 0:
+            for i in range(8):
+                row: list[Symbol] = []
+                for j in range(8):
+                    row.append(Symbol.getEmptyCell(Position(i, j)))
+                self.__board.append(row)
+
+        # If board is not an empty list
+        else:
+            for i in range(8):
+                for j in range(8):
+                    self.__board[i][j] = Symbol.getEmptyCell(Position(i, j))
+
+
+########################
+# Main Point
+########################
+if __name__ == '__main__':
+    Board().clear()
