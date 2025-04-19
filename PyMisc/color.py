@@ -209,6 +209,9 @@ def reset() -> str:
 def print_colored(text: str, prop: property, end: str = '') -> None:
     print(prop, text, reset(), sep='', end=end)
 
+def get_colored(text: str, prop: property) -> str:
+    return prop.__repr__() + text + reset() if text is not None and prop is not None else ""
+
 """
 foreground_colors = {
     'black': '\033[30m',

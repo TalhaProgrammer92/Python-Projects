@@ -18,7 +18,7 @@ pg.display.set_caption('Platformer Sample Game')            # Sets Title of the 
 #########################
 # Global Variables
 #########################
-RESOLUTION: tuple[int, int] = (1280, 800)                               # Defining Window's Resolution
+RESOLUTION: tuple[int, int] = (1280, 720)                               # Defining Window's Resolution
 FPS: constant = constant(60)                                                 # Frames Per Second
 PLAYER_VELOCITY: constant(5)                                              # Velocity / Speed of the player
 WINDOW: pg.display = pg.display.set_mode(RESOLUTION)       # Window Setup
