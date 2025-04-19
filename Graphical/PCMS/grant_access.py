@@ -21,33 +21,7 @@ try:
 
     # Get MAC address of the machine
     mac: str = ':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 2*6, 8)][::-1])
-"""
-To get mac in C# use following lines of code
 
-using System;
-using System.Linq;
-using System.Net.NetworkInformation;
-
-class Program
-{
-    static void Main()
-    {
-        string mac = GetMacAddress();
-        Console.WriteLine(mac);
-    }
-
-    static string GetMacAddress()
-    {
-        var macBytes = NetworkInterface
-            .GetAllNetworkInterfaces()
-            .Where(nic => nic.OperationalStatus == OperationalStatus.Up && nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
-            .Select(nic => nic.GetPhysicalAddress().GetAddressBytes())
-            .FirstOrDefault();
-
-        return macBytes != null ? string.Join(":", macBytes.Select(b => b.ToString("X2"))) : "00:00:00:00:00:00";
-    }
-}
-"""
     # Save to file
     with open(path, 'w') as file:
         file.write(mac)
