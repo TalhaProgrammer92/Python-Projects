@@ -48,7 +48,7 @@ text: str = get_text(input('Enter complete path of the text file you want to wri
 #* Print time estimation for typing the text
 print_time_estimation(text)
 delay: float = 0.3      # Delay between each character
-speed: int = 5          # Typing speed multiplier
+speed: int = 4          # Typing speed multiplier (4 is normal speed)
 legals: str = ascii_letters + punctuation + digits
 hold: int = 5           # Hold for few seconds before start typing
 
