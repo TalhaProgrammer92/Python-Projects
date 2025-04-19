@@ -123,19 +123,20 @@ class Position:
 # Symbol Class
 ########################
 class Symbol:
-    def __init__(self, unicode: str, color_property: clr.property):
+    def __init__(self, unicode: str, color_property: clr.property, position: Position):
         self.unicode: str = unicode
         self.color: clr.property = color_property
+        self.position: Position = position
 
     # Method to get empty symbol
     @staticmethod
     def getEmptyCell(position: Position):
         """ This method generates symbol object for empty board cell dynamically based on given position """
-        _, __ = [unicode.SYMBOL['empty-white'], unicode.SYMBOL['empty-black']], [clr.property(clr.foreground.bright_cyan()), clr.property(clr.foreground.bright_blue())]
+        _, __ = [unicode.SYMBOL['empty-white'], unicode.SYMBOL['empty-black']], [clr.property(clr.foreground.cyan()), clr.property(clr.foreground.blue())]
 
         index: int = (position.row + position.column) % 2
 
-        return Symbol(_[index], __[index])
+        return Symbol(_[index], __[index], position)
 
     # Representation Method
     def __repr__(self) -> str:
@@ -166,9 +167,19 @@ class Board:
                 for j in range(8):
                     self.__board[i][j] = Symbol.getEmptyCell(Position(i, j))
 
+    # Method to display board
+    def display(self) -> None:
+        """ This method display the entire board """
+        for i in range(8):
+            for j in range(8):
+                print(self.__board[i][j], end=' ')
+            print()
+
 
 ########################
 # Main Point
 ########################
 if __name__ == '__main__':
-    Board().clear()
+    board = Board()     # For testing purposes
+    board.clear()
+    board.display()
