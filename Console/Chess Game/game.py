@@ -123,11 +123,11 @@ class Heading:
         # Style Attributes
         self.__decorator: Text = decorator
         self.__padding: int = padding
-        self.__length: int = self.message.length + self.__padding * 4
 
     # Print line
     def printLine(self):
-        for i in range(self.__length):
+        length: int = self.message.length + self.__padding * 4
+        for i in range(length):
             print(self.__decorator, end='')
         print()
 
@@ -330,7 +330,14 @@ if __name__ == '__main__':
     board.clear()
     board.display()
 
-    head: Heading = Heading(message=Message(Text('Heading', clr.property(clr.foreground.bright_green()))))
+    head: Heading = Heading(
+        message=Message(Text('Heading', clr.property(clr.foreground.bright_green()))),
+        decorator=Text('$', clr.property(
+            clr.foreground.bright_magenta(),
+            None,
+            [clr.style.bold()]
+        ))
+    )
 
     head.message.text.append(Text('Test', clr.property(clr.foreground.bright_yellow())))
 
