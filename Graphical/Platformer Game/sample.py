@@ -12,7 +12,7 @@ from PyMisc.variable import constant, position
 # Game Setup
 #########################
 pg.init()                                                                       # Initialize game window
-pg.display.set_caption('Platformer Sample Game')            # Sets Title of the game window
+pg.displayMessage.set_caption('Platformer Sample Game')            # Sets Title of the game window
 
 
 #########################
@@ -21,7 +21,7 @@ pg.display.set_caption('Platformer Sample Game')            # Sets Title of the 
 RESOLUTION: tuple[int, int] = (1280, 720)                               # Defining Window's Resolution
 FPS: constant = constant(60)                                                 # Frames Per Second
 PLAYER_VELOCITY: constant(5)                                              # Velocity / Speed of the player
-WINDOW: pg.display = pg.display.set_mode(RESOLUTION)       # Window Setup
+WINDOW: pg.displayMessage = pg.displayMessage.set_mode(RESOLUTION)       # Window Setup
 
 
 #########################
@@ -71,7 +71,7 @@ class game_background:
             window.blit(image, pos.get)
 
         # Update the game's display i.e. window screen
-        pg.display.update()
+        pg.displayMessage.update()
 
 
 #########################

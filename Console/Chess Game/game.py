@@ -1,7 +1,34 @@
 import PyMisc.color as clr
 import os
 import time
-import unicode
+
+
+########################
+# Unicode Dictionary
+########################
+PIECE = {
+    'black' : {
+        'pawn' : "\u2659",
+        'knight' : "\u265E",
+        'bishop' : "\u265D",
+        'rook' : "\u265C",
+        'queen' : "\u265B",
+        'king' : "\u265A"
+    },
+    'white' : {
+        'pawn' : "\u2659",
+        'knight' : "\u2658",
+        'bishop' : "\u2657",
+        'rook' : "\u2656",
+        'queen' : "\u2655",
+        'king' : "\u2654"
+    }
+}
+
+SYMBOL = {
+    'empty-white' : '\u25CF',
+    'empty-black' : '\u25CB'
+}
 
 
 ########################
@@ -21,6 +48,102 @@ class TimeCounter:
     @property
     def duration(self):
         return self.__current - self.__start if self.__current is not None else None
+
+
+########################
+# Text Class
+########################
+class Text:
+    def __init__(self, text: str, color: clr.property):
+        self.__text: str = text
+        self.__color: clr.property = color
+
+    # Getters
+    @property
+    def text(self) -> str:
+        return self.__text
+
+    @property
+    def color(self) -> clr.property:
+        return self.__color
+
+    # Representation method
+    def __repr__(self) -> str:
+        return clr.get_colored(self.text, self.color)
+
+
+########################
+# Message Class
+########################
+class Message:
+    def __init__(self, text: Text):
+        self.text: list[Text] = [text]
+
+    # Getter - length
+    @property
+    def length(self) -> int:
+        _len: int = 0
+
+        # Accessing each element
+        for element in self.text:
+            _len += len(element.text) + 1
+        _len -= 1
+
+        return _len
+
+    # Display method
+    def display(self):
+        """ This method is used to display message on console """
+        for text in self.text:
+            print(text, end=' ')
+
+
+########################
+# Error Message Class
+########################
+class ErrorMessage(Message):
+    def __init__(self, text: str):
+        super().__init__(Text(
+            text,
+            clr.property(
+                clr.foreground.bright_red(),
+                None,
+                [clr.style.bold()])
+        ))
+
+
+########################
+# Heading Class
+########################
+class Heading:
+    def __init__(self, message: Message, decorator: Text = Text('*', clr.property(clr.foreground.bright_white())), padding: int = 1):
+        # Message attribute
+        self.message: Message = message
+
+        # Style Attributes
+        self.__decorator: Text = decorator
+        self.__padding: int = padding
+        self.__length: int = self.message.length + self.__padding * 4
+
+    # Print line
+    def printLine(self):
+        for i in range(self.__length):
+            print(self.__decorator, end='')
+        print()
+
+    # Display method
+    def display(self):
+        """ This method overrides Message display method """
+        self.printLine()
+
+        print(self.__decorator, ' ' * self.__padding, end='', sep='')
+
+        self.message.display()
+
+        print(self.__decorator, ' ' * self.__padding, sep='')
+
+        self.printLine()
+
 
 ########################
 # Name Class
@@ -132,7 +255,7 @@ class Symbol:
     @staticmethod
     def getEmptyCell(position: Position):
         """ This method generates symbol object for empty board cell dynamically based on given position """
-        _, __ = [unicode.SYMBOL['empty-white'], unicode.SYMBOL['empty-black']], [clr.property(clr.foreground.cyan()), clr.property(clr.foreground.blue())]
+        _, __ = [SYMBOL['empty-white'], SYMBOL['empty-black']], [clr.property(clr.foreground.cyan()), clr.property(clr.foreground.blue())]
 
         index: int = (position.row + position.column) % 2
 
@@ -206,3 +329,9 @@ if __name__ == '__main__':
     board = Board()     # For testing purposes
     board.clear()
     board.display()
+
+    head: Heading = Heading(message=Message(Text('Heading', clr.property(clr.foreground.bright_green()))))
+
+    head.message.text.append(Text('Test', clr.property(clr.foreground.bright_yellow())))
+
+    head.display()
