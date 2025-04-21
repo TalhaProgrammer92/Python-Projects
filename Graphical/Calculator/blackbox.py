@@ -99,15 +99,17 @@ class AdvancedCalculatorApp:
         elif button_text == '=':
             self.calculate_result()
         elif button_text == '√':
-            self.append_operator('math.sqrt(')
-            self.current_expression += ")"
+            exp = self.current_expression
+            self.current_expression = ""
+            self.append_operator(f'sqrt({exp})')
         elif button_text == 'x²':
             self.append_operator('**2')
         elif button_text == 'π':
             self.append_operator(str(math.pi))
         elif button_text in ['sin', 'cos', 'tan']:
-            self.append_operator(f'math.{button_text}(math.radians(')
-            self.current_expression += "))"
+            exp = self.current_expression
+            self.current_expression = ""
+            self.append_operator(f'{button_text}(radians({exp}))')
         else:
             self.append_operator(button_text)
     
@@ -134,11 +136,18 @@ class AdvancedCalculatorApp:
                 return
             
             expression = expression.replace('π', 'math.pi')
-            expression = expression.replace('math.sin(math.radians', 'math.sin')
-            expression = expression.replace('math.cos(math.radians', 'math.cos')
-            expression = expression.replace('math.tan(math.radians', 'math.tan')
+            # expression = expression.replace('math.sin(math.radians', 'math.sin')
+            # expression = expression.replace('math.cos(math.radians', 'math.cos')
+            # expression = expression.replace('math.tan(math.radians', 'math.tan')
             
-            result = eval(expression)
+            result = eval(expression, {"__builtins__": None}, {
+                "sin": math.sin,
+                "cos": math.cos,
+                "tan": math.tan,
+                "sqrt": math.sqrt,
+                # "pi": math.pi,
+                "radians": math.radians
+            })
             
             self.full_expression = expression + " = "
             self.current_expression = str(result)
@@ -147,12 +156,27 @@ class AdvancedCalculatorApp:
             
             self.full_expression = ""
         except Exception as e:
-            messagebox.showerror("Error")
+            messagebox.showerror("Error", "Invalid Expression")
             self.current_expression = ""
             self.full_expression = ""
             self.update_displays()
 
 if __name__ == "__main__":
+    # # Let’s say you want to evaluate this expression:
+    # expression = "sin(radians(8))"  # Converting degrees to radians
+    #
+    # # eval() needs access to the math functions, so pass them as globals
+    # result = eval(expression, {"__builtins__": None}, {
+    #     "sin": math.sin,
+    #     "cos": math.cos,
+    #     "tan": math.tan,
+    #     "sqrt": math.sqrt,
+    #     "pi": math.pi,
+    #     "radians": math.radians
+    # })
+    #
+    # print(result)
+
     root = tk.Tk()
     app = AdvancedCalculatorApp(root)
     root.mainloop()
