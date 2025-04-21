@@ -146,6 +146,22 @@ class Heading:
 
 
 ########################
+# Menu Class
+########################
+class Menu:
+    def __init__(self, heading: Heading | None = None):
+        self.heading: Heading | None = heading
+        self.options: list[Text] = []
+
+    def display(self):
+        self.heading.display()
+        print()
+
+        for i in range(len(self.options)):
+            print(Text(str(i+1) + '.', clr.property(clr.foreground.bright_white())), self.options[i])
+
+
+########################
 # Name Class
 ########################
 class Name:
@@ -331,7 +347,7 @@ if __name__ == '__main__':
     board.display()
 
     head: Heading = Heading(
-        message=Message(Text('Heading', clr.property(clr.foreground.bright_green()))),
+        message=Message(Text('Main', clr.property(clr.foreground.bright_green()))),
         decorator=Text('$', clr.property(
             clr.foreground.bright_magenta(),
             None,
@@ -339,6 +355,15 @@ if __name__ == '__main__':
         ))
     )
 
-    head.message.text.append(Text('Test', clr.property(clr.foreground.bright_yellow())))
+    head.message.text.append(Text('Menu', clr.property(clr.foreground.bright_yellow())))
 
-    head.display()
+    # head.display()
+
+    menu: Menu = Menu(head)
+    menu.options.extend([
+        Text('New Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic())),
+        Text('Load Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic())),
+        Text('Exit Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic()))
+    ])
+
+    menu.display()
