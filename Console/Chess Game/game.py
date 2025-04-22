@@ -437,6 +437,10 @@ class Database:
         """ Method to remove data from a table """
         self.commit(f"DELETE FROM {table} WHERE {condition}")
 
+    # Destructor
+    def __del__(self):
+        self.database.close()
+
 
 ########################
 # Main Point
