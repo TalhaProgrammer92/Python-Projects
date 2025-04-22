@@ -78,4 +78,4 @@ if __name__ == '__main__':
     #     Cipher("Ily rp[n' ,u]t. j]b ;p/\\g ]myu f Afvo h]kX", -shift).parse(),
     #     sep='\n'
     # )
-    print(Cipher("Python is best", 3).parse())
+    print(Cipher("Python is Best", 3).parse())
