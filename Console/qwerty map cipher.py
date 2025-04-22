@@ -76,5 +76,5 @@ if __name__ == '__main__':
     print(
         Cipher("The quick brown fox jumps over a lazy dog.", shift).parse(),
         Cipher("Ily rp[n' ,u]t. j]b ;p/\\g ]myu f Afvo h]kX", -shift).parse(),
-        sep='\n\n'
+        sep='\n'
     )
