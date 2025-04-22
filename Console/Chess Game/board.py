@@ -1,4 +1,5 @@
 import PyMisc.color as clr
+import settings as sets
 from utils import Position
 from unicode import *
 

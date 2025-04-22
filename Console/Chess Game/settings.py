@@ -1,4 +1,5 @@
 import PyMisc.color as clr
+from unicode import *
 
 ui: dict = {
     'menu' : {
@@ -20,4 +21,36 @@ ui: dict = {
             'heading-text' : 'Main Menu',
         }
     }
+}
+
+board: dict = {
+    # Empty cell
+    'empty-black-symbol' : SYMBOL['empty-black'],
+    'empty-black-color' : clr.property(
+        clr.foreground.green(),
+        None,
+        clr.style.bold()
+    ),
+
+    'empty-white-symbol' : SYMBOL['empty-white'],
+    'empty-white-color' : clr.property(
+        clr.foreground.cyan(),
+        None,
+        clr.style.bold()
+    ),
+
+    # Seperator
+    'column-separator-symbol' : '|',
+    'column-separator-color' : clr.property(
+        clr.foreground.bright_white(),
+        None,
+        clr.style.bold()
+    ),
+
+    'row-separator-symbol' : '---------------------------------',
+    'row-separator-color' : clr.property(
+        clr.foreground.bright_white(),
+        None,
+        clr.style.bold()
+    )
 }
