@@ -340,7 +340,7 @@ class Board:
 
 
 ########################
-# Database System
+# Database Class
 ########################
 class Database:
     def __init__(self, file: str):
