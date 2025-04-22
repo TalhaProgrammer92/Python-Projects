@@ -72,6 +72,17 @@ class Text:
     def __repr__(self) -> str:
         return clr.get_colored(self.text, self.color)
 
+# Function to take input from user
+def takeInput(message: Text) -> int:
+    """ Take input from user """
+    while True:
+        try:
+            num = int(input(message))
+            break
+        except Exception:
+            continue
+    return num
+
 
 ########################
 # Message Class
@@ -152,14 +163,23 @@ class Heading:
 class Menu:
     def __init__(self, heading: Heading | None = None):
         self.heading: Heading | None = heading
-        self.options: list[Text] = []
+        self.__options: list[Text] = []
+
+    @property
+    def options(self) -> list[Text]:
+        return self.__options
+
+    def addOption(self, option: Text) -> None:
+        """ Method to add an option for the menu """
+        self.__options.append(option)
 
     def display(self):
+        """ Method to display menu """
         self.heading.display()
         print()
 
-        for i in range(len(self.options)):
-            print(Text(str(i+1) + '.', clr.property(clr.foreground.bright_white())), self.options[i])
+        for i in range(len(self.__options)):
+            print(Text(str(i+1) + '.', clr.property(clr.foreground.bright_white())), self.__options[i])
 
 
 ########################
@@ -373,7 +393,7 @@ class Database:
     # Data Insertion
     def insertDataTo(self, table: str, header: list[str], values: list[int] | list[str]) -> None:
         """ Method to insert data into table """
-        self.commit(f"INSERT INTO {table} {tuple(header)} VALUES {tuple(values)}")
+        self.commit(f"INSERT INTO {table} {tuple(header)} VALUES ({','.join(['?' for i in range(len(values))])})", tuple(values))
 
     # Data Retrieval
     def retrieveDataFrom(self, table: str, header: list[str], condition: str = "") -> list:
@@ -387,14 +407,14 @@ class Database:
 
         # Fetch data
         self.cursor.execute(query)
-        data: list = self.cursor.fetchone()
+        data: list = self.cursor.fetchall()
         return data
 
     # Data Update
     def updateDataOf(self, table: str, header: list[str], values: list[int] | list[str], condition: str = "") -> None:
         """ Method to update data of a table """
         # Query
-        query: str = f"UPDATE {table} SET "
+        query: str = f"UPDATE {table} SET {tuple(header)}"
 
         # Adding data that will be updated
         if isinstance(header, str) or len(header) == 1:
@@ -425,25 +445,3 @@ if __name__ == '__main__':
     board = Board()     # For testing purposes
     board.clear()
     board.display()
-
-    # head: Heading = Heading(
-    #     message=Message(Text('Main', clr.property(clr.foreground.bright_green()))),
-    #     decorator=Text('$', clr.property(
-    #         clr.foreground.bright_magenta(),
-    #         None,
-    #         [clr.style.bold()]
-    #     ))
-    # )
-    #
-    # head.message.text.append(Text('Menu', clr.property(clr.foreground.bright_yellow())))
-    #
-    # # head.display()
-    #
-    # menu: Menu = Menu(head)
-    # menu.options.extend([
-    #     Text('New Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic())),
-    #     Text('Load Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic())),
-    #     Text('Exit Game', clr.property(clr.foreground.bright_red(), None, clr.style.italic()))
-    # ])
-    #
-    # menu.display()
