@@ -384,7 +384,7 @@ class Database:
         """ Method to create table """
         self.commit(f"""
             CREATE TABLE IS NOT EXISTS {name}(
-                --- Header
+ 
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 {','.join(head + ' INTEGER NOT NULL' for head in header)}
             )
