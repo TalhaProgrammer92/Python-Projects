@@ -72,10 +72,15 @@ class Cipher:
 
 
 if __name__ == '__main__':
-    shift: int = 3
+    # shift: int = 3
     # print(
     #     Cipher("The quick brown fox jumps over a lazy dog.", shift).parse(),
     #     Cipher("Ily rp[n' ,u]t. j]b ;p/\\g ]myu f Afvo h]kX", -shift).parse(),
     #     sep='\n'
     # )
-    print(Cipher("Python is Best", 3).parse())
+
+    shift = 5
+    print(Cipher("My name is Talha Ahmad.", shift).parse())
+    print(Cipher("I'm a computer science student.", shift).parse())
+    print(Cipher("Is it correct? 2 + 2 = 3. Yes, But in binary system.", shift).parse())
+    print(Cipher("The quick brown fox jumps over a lazy dog. This is a pangram which means it contains all aplhabets of English.", shift).parse())
