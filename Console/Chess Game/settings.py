@@ -2,24 +2,35 @@ import PyMisc.color as clr
 from unicode import *
 
 ui: dict = {
-    'menu' : {
-        'main' : {
-            # Decorator of the Main Menu
-            'decorator-symbol' : '#',
-            'decorator-color' : clr.property(
-                clr.property(
-                    clr.foreground.bright_blue(),
-                    clr.background.black(),
-                    [
-                        clr.style.bold(),
-                        clr.style.italic()
-                    ]
-                )
+    'text' : {
+        'default' : {
+            'heading-symbol' : '*',
+            'heading-color' : clr.property(
+                clr.foreground.white()
             ),
 
-            # Heading text
-            'heading-text' : 'Main Menu',
-        }
+            'text-content' : 'Sample Text',
+            'text-color' : clr.property(
+                clr.foreground.magenta(),
+                None,
+                clr.style.bold()
+            )
+        },
+    },
+
+    'menu' : {
+        # Decorator of the Main Menu
+        'decorator-symbol' : '#',
+        'decorator-color' : clr.property(
+            clr.property(
+                clr.foreground.bright_blue(),
+                clr.background.black(),
+                [
+                    clr.style.bold(),
+                    clr.style.italic()
+                ]
+            )
+        )
     }
 }
 
