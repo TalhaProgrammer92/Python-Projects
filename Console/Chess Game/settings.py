@@ -27,14 +27,14 @@ board: dict = {
     # Empty cell
     'empty-black-symbol' : SYMBOL['empty-black'],
     'empty-black-color' : clr.property(
-        clr.foreground.green(),
+        clr.foreground.red(),
         None,
         clr.style.bold()
     ),
 
     'empty-white-symbol' : SYMBOL['empty-white'],
     'empty-white-color' : clr.property(
-        clr.foreground.cyan(),
+        clr.foreground.blue(),
         None,
         clr.style.bold()
     ),
@@ -51,6 +51,13 @@ board: dict = {
     'row-separator-color' : clr.property(
         clr.foreground.bright_white(),
         None,
+        clr.style.bold()
+    ),
+
+    # Numbers
+    'number-color' : clr.property(
+        clr.foreground.black(),
+        clr.background.white(),
         clr.style.bold()
     )
 }
