@@ -78,7 +78,7 @@ class ErrorMessage(Message):
 # Heading Class
 ########################
 class Heading:
-    def __init__(self, message: Message = Message(Text(settings.ui['text']['default']['text-content'], settings.ui['text']['default']['text-color'])), decorator: Text = Text(settings.ui['text']['default']['heading-symbol'], settings.ui['text']['default']['heading-color']), padding: int = 1):
+    def __init__(self, message: Message = Message(Text(settings.ui['text']['default']['text-content'], settings.ui['text']['default']['text-color'])), decorator: Text = Text(settings.ui['text']['default']['heading-symbol'], settings.ui['text']['default']['heading-color'][settings.theme[settings.theme_toggle]]), padding: int = 1):
         # Message attribute
         self.message: Message = message
 

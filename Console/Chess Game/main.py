@@ -1,4 +1,4 @@
-import settings as sets
+import settings
 from board import Board
 from ui import Heading
 
@@ -7,6 +7,8 @@ if __name__ == '__main__':
     board.display()
 
     print()
+
+    settings.switchTheme()
 
     head: Heading = Heading()
     head.display()

@@ -1,17 +1,20 @@
 import PyMisc.color as clr
 from unicode import *
 
+theme: tuple[str, str] = ('dark', 'light')
+theme_toggle: int = 0   # 0 - Dark | 1 - Light
+
 ui: dict = {
     'text' : {
         'default' : {
             'heading-symbol' : '*',
-            'heading-color' : clr.property(
-                clr.foreground.white()
-            ),
+            'heading-color' : {'dark' : clr.property(
+                clr.foreground.magenta()
+            ), 'light' : clr.property(clr.foreground.white())},
 
             'text-content' : 'Sample Text',
             'text-color' : clr.property(
-                clr.foreground.magenta(),
+                clr.foreground.red(),
                 None,
                 clr.style.bold()
             )
@@ -72,3 +75,7 @@ board: dict = {
         clr.style.bold()
     )
 }
+
+def switchTheme():
+    global theme_toggle
+    theme_toggle ^= 1
