@@ -1,7 +1,7 @@
-import random as r                  # Random number generation
-import pygame as pg                 # Game development
-import pygame.locals as ploc        # Pygame locals
-import sys                          # Exit the program
+import random as r  # Random number generation
+import pygame as pg  # Game development
+import pygame.locals as ploc  # Pygame locals
+import sys  # Exit the program
 
 
 #############
@@ -48,6 +48,9 @@ class Pipe(Sprite):
         super().__init__(path)
 
 
+# Get number sprite
+numSprite = lambda num: Sprite(f'assets/sprites/numbers/{num}.png')
+
 #######################
 # Global Variables
 #######################
@@ -59,12 +62,26 @@ GROUND_SIZE: Vector = Vector(RESOLUTION.x // 2, RESOLUTION.y // 2)
 
 BACKGROUND: Background = Background('assets/sprites/background.png')
 PIPE: Pipe = Pipe('assets/sprites/pipe.png')
+BIRD: Bird = Bird()
 
 SPRITES = {
+    # Numbers Sprites (0 to 9)
+    'numbers': (pg.image.load(numSprite(i).path).convert_alpha() for i in range(10)),
 
+    # Pipe (Obstacle)
+    'pipe': {
+        'bottom': pg.image.load(PIPE.path).convert_alpha(),
+        'up': pg.transform.rotate(pg.image.load(PIPE.path).convert_alpha(), 180)
+    },
+
+    # Background Image
+    'background': pg.image.load(BACKGROUND.path).convert_alpha(),
+
+    # Bird Image
+    'bird': pg.image.load(BIRD.sprite.path).convert_alpha(),
 }
 SOUNDS = {
-    
+
 }
 
 
@@ -73,10 +90,10 @@ SOUNDS = {
 #############
 class Game:
     def __init__(self):
-        pg.init()   # Initialize Pygame
-        pg.display.set_caption('Flappy Bird')   # Title of the game window screen
+        pg.init()  # Initialize Pygame
+        pg.display.set_caption('Flappy Bird')  # Title of the game window screen
 
-        self.fps_clock = pg.time.Clock()    # To track time for smooth FPS
+        self.fps_clock = pg.time.Clock()  # To track time for smooth FPS
 
 
 ############
