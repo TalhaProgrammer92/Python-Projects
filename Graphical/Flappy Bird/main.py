@@ -118,9 +118,15 @@ class Game:
         self.fps_clock = pg.time.Clock()  # To track time for smooth FPS
 
 
+# Main
+def main():
+    game: Game = Game()
+    # time.sleep(2)
+
+
 ############
 # Debug
 ############
 if __name__ == '__main__':
-    game: Game = Game()
-    # time.sleep(2)
+    main()
+
