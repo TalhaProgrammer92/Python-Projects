@@ -5,6 +5,8 @@ import pygame as pg  # Game development
 import pygame.locals as ploc  # Pygame locals
 import sys  # Exit the program
 
+from pygame import Surface, SurfaceType
+
 
 #############
 # Vector
@@ -26,7 +28,10 @@ class Sprite:
         self.path = path
 
     def load(self):
-        pg.image.load(self.path).convert_alpha()
+        return pg.image.load(self.path).convert_alpha()
+
+    def rotate(self, angle: int) -> Surface | SurfaceType:
+        return pg.transform.rotate(self.load(), angle)
 
 
 ###########
@@ -51,12 +56,6 @@ class Background(Sprite):
 class Pipe(Sprite):
     def __init__(self, path: str):
         super().__init__(path)
-
-    def rotate(self, angle: int) -> None:
-        pg.transform.rotate(
-            pg.image.load(self.path).convert_alpha(),
-            angle
-        )
 
 
 #############
@@ -129,4 +128,3 @@ def main():
 ############
 if __name__ == '__main__':
     main()
-
