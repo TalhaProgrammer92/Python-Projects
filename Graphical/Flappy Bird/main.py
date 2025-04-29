@@ -25,6 +25,9 @@ class Sprite:
     def __init__(self, path: str):
         self.path = path
 
+    def load(self):
+        pg.image.load(self.path).convert_alpha()
+
 
 ###########
 # Bird
@@ -49,6 +52,21 @@ class Pipe(Sprite):
     def __init__(self, path: str):
         super().__init__(path)
 
+    def rotate(self, angle: int) -> None:
+        pg.transform.rotate(
+            pg.image.load(self.path).convert_alpha(),
+            angle
+        )
+
+
+#############
+# Ground
+#############
+class Ground(Sprite):
+    def __init__(self, path: str, size: Vector):
+        super().__init__(path)
+        self.size: Vector = size
+
 
 # Get number sprite
 numSprite = lambda num: Sprite(f'assets/sprites/numbers/{num}.png')
@@ -60,27 +78,29 @@ FPS: int = 30
 RESOLUTION: Vector = Vector(720, 1024)
 SCENE: pg.Surface = pg.display.set_mode(RESOLUTION.get())
 
-GROUND_SIZE: Vector = Vector(RESOLUTION.x // 2, RESOLUTION.y // 2)
-
 BACKGROUND: Background = Background('assets/sprites/background.png')
 PIPE: Pipe = Pipe('assets/sprites/pipe.png')
 BIRD: Bird = Bird()
+GROUND: Ground = Ground('assets/sprites/ground.png', Vector(RESOLUTION.x // 2, RESOLUTION.y // 2))
 
 SPRITES = {
     # Numbers Sprites (0 to 9)
-    'numbers': (pg.image.load(numSprite(i).path).convert_alpha() for i in range(10)),
+    'numbers': [numSprite(i).load() for i in range(10)],
 
     # Pipe (Obstacle)
     'pipe': {
-        'bottom': pg.image.load(PIPE.path).convert_alpha(),
-        'up': pg.transform.rotate(pg.image.load(PIPE.path).convert_alpha(), 180)
+        'bottom': PIPE.load(),
+        'up': PIPE.rotate(180)
     },
 
     # Background Image
-    'background': pg.image.load(BACKGROUND.path).convert_alpha(),
+    'background': BACKGROUND.load(),
 
     # Bird Image
-    'bird': pg.image.load(BIRD.sprite.path).convert_alpha(),
+    'bird': BIRD.sprite.load(),
+
+    # Ground Image
+    'ground': GROUND.load()
 }
 SOUNDS = {
 
