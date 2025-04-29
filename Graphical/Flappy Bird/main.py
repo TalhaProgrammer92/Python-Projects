@@ -1,4 +1,6 @@
 import random as r  # Random number generation
+import time
+
 import pygame as pg  # Game development
 import pygame.locals as ploc  # Pygame locals
 import sys  # Exit the program
@@ -55,7 +57,7 @@ numSprite = lambda num: Sprite(f'assets/sprites/numbers/{num}.png')
 # Global Variables
 #######################
 FPS: int = 30
-RESOLUTION: Vector = Vector(800, 600)
+RESOLUTION: Vector = Vector(720, 1024)
 SCENE: pg.Surface = pg.display.set_mode(RESOLUTION.get())
 
 GROUND_SIZE: Vector = Vector(RESOLUTION.x // 2, RESOLUTION.y // 2)
@@ -101,3 +103,4 @@ class Game:
 ############
 if __name__ == '__main__':
     game: Game = Game()
+    # time.sleep(2)
