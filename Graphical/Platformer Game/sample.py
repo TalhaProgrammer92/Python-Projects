@@ -89,13 +89,30 @@ class Engine:
     def start(self):
         """ Start the game engine """
         while self.running:
+            self.handle_events()
+            
             self.clock.tick(self.game.fps)
+        
+        pg.quit()
+
+    def handle_events(self):
+        """ Handle in-game events """
+        for event in pg.event.get():
+            # ! Press close button
+            if event.type == pg.QUIT:
+                self.running = False
+                return
+
+# ? Demo of the game
+def demo():
+    """ Game demo """
+    Engine(
+        Game('Platformer Game - Demo', Vector(800, 600), Player(5))
+    ).start()
+    quit()
 
 #########################
 # Testing
 #########################
 if __name__ == '__main__':
-    demo: Engine = Engine(
-        Game('Platformer Game', Vector(800, 600), Player(5))
-    )
-    demo.start()
+    demo()
