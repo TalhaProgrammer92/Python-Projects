@@ -36,10 +36,18 @@ class Sprite:
         return pg.transform.rotate(self.load, angle)
 
 ###################
-# Screen Class
+# Player Class
 ###################
-class Screen:
-    def __init__(self, caption: str, resolution: Vector):
+class Player:
+    def __init__(self, speed: int):
+        self.__speed: int = speed
+        
+
+#################
+# Game Class
+#################
+class Game:
+    def __init__(self, caption: str, resolution: Vector, player: Player):
         # * Initialization
         pg.init()
         pg.display.set_caption(caption)
@@ -48,6 +56,12 @@ class Screen:
         self.__bg_color: tuple[int, int, int] = (255, 255, 255)
         self.__resolution: Vector = resolution
         self.__fps: int = 60
+
+        # * Game screen initialization
+        self.window = pg.display.set_mode(resolution.get)
+
+        # * Game Objects
+        self.player: Player = player
     
     # * Getters
     @property
@@ -63,9 +77,17 @@ class Screen:
         return self.__fps
 
 
+# ? Demo function
+def demo():
+    game: Game = Game(
+        'Platformer Game', 
+        Vector(800, 600), 
+        Player(5)
+    )
+
 #########################
 # Testing
 #########################
 if __name__ == '__main__':
-    game: Screen = Screen('Platformer Game', Vector(800, 600))
+    demo()
 
