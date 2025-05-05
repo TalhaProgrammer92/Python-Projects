@@ -109,7 +109,7 @@ class Engine:
 def demo():
     """ Game demo """
     Engine(
-        Game('Platformer Game - Demo', Vector(800, 600), Player(5))
+        Game('Platformer Game - Demo', Vector(1024, 720), Player(5))
     ).start()
     quit()
 
