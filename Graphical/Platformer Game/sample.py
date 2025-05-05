@@ -76,18 +76,26 @@ class Game:
     def fps(self) -> int:
         return self.__fps
 
+###################
+# Engine Class
+###################
+class Engine:
+    def __init__(self, game: Game):
+        # * Necessary objects
+        self.game: Game = game
+        self.clock = pg.time.Clock()
+        self.running: bool = True
 
-# ? Demo function
-def demo():
-    game: Game = Game(
-        'Platformer Game', 
-        Vector(800, 600), 
-        Player(5)
-    )
+    def start(self):
+        """ Start the game engine """
+        while self.running:
+            self.clock.tick(self.game.fps)
 
 #########################
 # Testing
 #########################
 if __name__ == '__main__':
-    demo()
-
+    demo: Engine = Engine(
+        Game('Platformer Game', Vector(800, 600), Player(5))
+    )
+    demo.start()
