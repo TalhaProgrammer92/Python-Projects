@@ -89,10 +89,12 @@ class Engine:
     def start(self):
         """ Start the game engine """
         while self.running:
-            self.handle_events()
-            
+            # ! Tick the FPS
             self.clock.tick(self.game.fps)
-        
+            
+            # ! Handle all events
+            self.handle_events()
+
         pg.quit()
 
     def handle_events(self):
