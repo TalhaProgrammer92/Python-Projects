@@ -54,10 +54,11 @@ settings: dict = {
 ##################
 class Piece:
     # Constructor
-    def __init__(self, _symbol: str, _color: color.property):
+    def __init__(self, _symbol: str, _color: color.property, _position: position):
         self.__symbol = _symbol
         self.__color = _color
         self.__special: bool = False
+        self.position: position = _position
 
     # Getters
     @property
@@ -74,5 +75,14 @@ class Piece:
 
     # Make the piece special
     def make_special(self) -> None:
+        """ Make the piece special i.e. 4 directional """
         self.__special = True
+        self.__color.add_style(color.style.bold())
 
+
+#################
+# Cell Class
+#################
+class Cell:
+    def __init__(self, piece: Piece = None):
+        pass
