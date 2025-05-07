@@ -9,8 +9,8 @@ import time
 settings: dict = {
     # Pieces
     'piece': {
-        'black': '\u25CF',
-        'white': '\u25CB'
+        'black': '\u25CF',  # ●
+        'white': '\u25CB'   # ○
     },
 
     # Color Properties
@@ -40,6 +40,39 @@ settings: dict = {
         'separator': {
             'row': '-' * 11,     # size + 3 => 8 + 3 = 11
             'column': '|'
+        },
+        'cell': {
+            'black': '.',
+            'white': '*'
         }
     }
 }
+
+
+##################
+# Piece Class
+##################
+class Piece:
+    # Constructor
+    def __init__(self, _symbol: str, _color: color.property):
+        self.__symbol = _symbol
+        self.__color = _color
+        self.__special: bool = False
+
+    # Getters
+    @property
+    def symbol(self) -> str:
+        return self.__symbol
+
+    @property
+    def color(self) -> color.property:
+        return self.__color
+
+    @property
+    def special(self) -> bool:
+        return self.__special
+
+    # Make the piece special
+    def make_special(self) -> None:
+        self.__special = True
+

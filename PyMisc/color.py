@@ -187,6 +187,13 @@ class property:
     def is_correct_code(code: str) -> bool:
         return code[:5] == '\033[' and code[-1] == 'm'
 
+    # Add new style
+    def add_style(self, _style: str) -> None:
+        _style = var.constant(_style)
+
+        if property.is_correct_code(_style.value) and _style not in self.__styles:
+            self.__styles.append(_style)
+
     def __repr__(self) -> str:
         code: str = ''
 
