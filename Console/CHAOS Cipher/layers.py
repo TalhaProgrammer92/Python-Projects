@@ -1,5 +1,12 @@
 from string import ascii_letters
 
+def shifted_character_index(char: str, _list: list | tuple, shift: int) -> str:
+	""" Get index of the shifted character """
+	index: int = _list.index(char)
+	for i in range(abs(shift)):
+		pass
+
+
 class ceaser:
 	"""
 	? Layer 1 - Ceaser Cipher
@@ -13,7 +20,7 @@ class ceaser:
 		result: str = ''
 
 		print(text)		# ? Debug
-		
+
 		# * Iterate through each character of the text
 		for c in text:
 			print(f'{c} -> ', end='')	# ? Debug
