@@ -1,10 +1,10 @@
-import layers.ceaser as ceaser
+import layers
 
 # ! Used to shift characters in a message
 shift: int = 3
 
 if '__main__' == __name__:
-	encoded: str = ceaser.Cipher.parse('Hello, World!', shift)
-	decoded: str = ceaser.Cipher.parse(encoded, -shift)
+	encoded: str = layers.ceaser.parse('Hello, World!', shift)
+	decoded: str = layers.ceaser.parse(encoded, -shift)
 	print(decoded, encoded, sep='\n')
 	# print(chr(65), ord('A'))
