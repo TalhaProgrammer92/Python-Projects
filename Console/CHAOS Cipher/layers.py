@@ -12,10 +12,12 @@ class ceaser:
 	def parse(text: str, shift: int) -> str:
 		result: str = ''
 
+		print(text)		# ? Debug
+		
 		# * Iterate through each character of the text
-		print(text)
 		for c in text:
-			print(f'{c} -> ', end='')
+			print(f'{c} -> ', end='')	# ? Debug
+
 			# * If the character is an ascii letter
 			if c in ascii_letters:
 				# * Index of the character in ascii_letters list
@@ -25,14 +27,16 @@ class ceaser:
 				for i in range(abs(shift)):
 					# ! If shift is positive
 					if shift > 0:
+						# * If the index reached limit of the list ascii_letters' size
 						if index == len(ascii_letters) - 1:
 							index = 0
 							continue
 						index += 1
 					
 					# ! If shift is negative
-					else:
-						if index < 0:
+					elif shift < 0:
+						# * If the index reached the starting index of the list of ascii_letters
+						if index == 0:
 							index = len(ascii_letters) - 1
 							continue
 						index -= 1
@@ -40,7 +44,7 @@ class ceaser:
 				# ! Assign new shifted character
 				c = ascii_letters[index]
 			
-			print(c)
+			print(c)	# ? Debug
 			c += result
 		
 		return result
