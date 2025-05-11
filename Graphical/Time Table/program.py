@@ -13,7 +13,7 @@ DAYS: tuple = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday
 # Time class
 #################
 class Time:
-    def __init__(self, hour: int, minute: int, second: int):
+    def __init__(self, hour: int, minute: int, second: int = 0):
         self.hour: int = hour if 24 > hour >= 0 else 0
         self.minute: int = minute if 60 > minute >= 0 else 0
         self.second: int = second if 60 > second >= 0 else 0
@@ -31,22 +31,37 @@ class Event:
         self.name: str = name if len(name) > 0 and not name.isspace() else 'Unknown'
         self.start_time: Time = start_time
         self.end_time: Time = end_time
-        self.days: list = []
+        self.__days: list = []
+
+    @property
+    def days(self) -> list:
+        return self.__days
 
     # * Add days
-    def addDay(self, day: str) -> None:
-        if day not in self.days and day in DAYS:
-            self.days.append(day)
+    def add_day(self, day: str) -> None:
+        if day not in self.__days and day in DAYS:
+            self.__days.append(day)
 
     # * Representation
     def __repr__(self) -> str:
-        return f""" Event - {self.name}
+        return f"""Event - {self.name}
 Start: {self.start_time.__repr__()}
 End: {self.end_time.__repr__()}
-Days: {[day for day in self.days]}"""
+Days: {', '.join([day for day in self.__days]) if len(self.__days) > 0 else 'None'}\n"""
+
 
 ##############
 # Testing
 ##############
 if __name__ == '__main__':
-    pass
+    events: list = [
+        Event('Breakfast', Time(8, 0), Time(8, 30)),
+        Event('Code', Time(9, 0), Time(11, 0))
+    ]
+
+    for i in range(2):
+        # events[0].add_day(DAYS[i])
+        events[1].add_day(DAYS[i])
+
+    for event in events:
+        print(event)
