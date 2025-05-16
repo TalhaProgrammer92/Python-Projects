@@ -39,7 +39,7 @@ class Custom:  # INFO: Custom number having value range defined by user
         self.__value = v if is_valid(self.__value, self.base) else self.__value
 
     def __repr__(self) -> str:
-        return f'Value:\t{self.value}\nBase:\t{self.base}\nName:\t{self.name}'
+        return f'Value:\t{self.value}\nBase:\t{self.base}\nName:\t{self.name.capitalize()}'
 
 
 ############################
@@ -64,8 +64,10 @@ def convert(number: Custom, base: int) -> Custom:
     else:
         result = 0
         value: str = number.value
+        p: int = len(value) - 1
         for digit in value:
-            result += result * number.base + LEGALS.index(digit)
+            result += LEGALS.index(digit) * pow(number.base, p)
+            p -= 1
         result = str(result)
 
     return Custom(result, base)
@@ -75,5 +77,10 @@ def convert(number: Custom, base: int) -> Custom:
 # Testing
 ##############
 if __name__ == '__main__':
-    dec: Custom = Custom('11', 10)
-    print(convert(dec, 2))
+    decimal: Custom = Custom('11', 10)
+    binary: Custom = convert(decimal, 2)
+    print(
+        binary,
+        convert(binary, 10),
+        sep='\n\n'
+    )
