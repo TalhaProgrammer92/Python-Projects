@@ -8,7 +8,7 @@ LEGALS: str = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 def is_valid(number: str, base: int) -> bool:
     for digit in number:
-        if digit not in LEGALS[:base]:
+        if digit.upper() not in LEGALS[:base]:
             return False
     return True
 
@@ -66,7 +66,7 @@ def convert(number: Custom, base: int) -> Custom:
         value: str = number.value
         p: int = len(value) - 1
         for digit in value:
-            result += LEGALS.index(digit) * pow(number.base, p)
+            result += LEGALS.index(digit.upper()) * pow(number.base, p)
             p -= 1
         result = str(result)
 

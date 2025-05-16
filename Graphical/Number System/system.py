@@ -2,9 +2,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as tmsg
-import PyMisc.system as mac
 import PyMisc.number as number
-from PyMisc.variable import constant, resolution
+from PyMisc.variable import resolution
 
 
 ##################
