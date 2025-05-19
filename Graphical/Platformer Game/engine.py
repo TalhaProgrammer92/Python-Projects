@@ -16,7 +16,7 @@ class Vector:
         self.x: int = x
     
     @property
-    def get(self):
+    def get(self) -> tuple[int, int]:
         """ Return tuple of the vector """
         return (self.y, self.x)
 
