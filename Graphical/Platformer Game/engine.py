@@ -40,7 +40,6 @@ class Sprite:
 
     def draw(self, surface: pg.Surface, position: Vector) -> None:
         surface.blit(self.image, position.get_tuple())
-        pg.display.update()
 
 #############
 # Player
@@ -75,6 +74,7 @@ class Background:
     def draw(self, positions: list[Vector], surface: pg.Surface) -> None:
         for position in positions:
             self.sprite.draw(surface, position)
+        pg.display.update()
 
 ###########
 # Game
@@ -132,7 +132,7 @@ class Engine:
 # Demo
 ###########
 def demo():
-    game: Game = Game(settings.game['title'] + ' - Demo', settings.game['resolution'], Background("yellow"))
+    game: Game = Game(settings.game['title'] + ' - Demo', settings.game['resolution'], Background("gray"))
     engine: Engine = Engine(game)
     engine.start()
 
