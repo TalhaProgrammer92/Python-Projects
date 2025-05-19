@@ -42,11 +42,24 @@ class Sprite:
         surface.blit(self.image, position.get_tuple())
 
 #############
+# Object
+#############
+class Object(pg.sprite.Sprite):
+    def __init__(self, sprite: Sprite, position: Vector, size: Vector):
+        super().__init__()
+        self.sprite: Sprite = sprite
+        self.position: Vector = position
+        self.size: Vector = size
+
+#############
 # Player
 #############
-class Player:
-    def __init__(self, velocity: int):
-        self.velocity: int = velocity
+class Player(Object):
+    def __init__(self, speed: int, sprite: Sprite, position: Vector, size: Vector):
+        super().__init__(sprite, position, size)
+        self.speed: int = speed
+        self.velocity: Vector = Vector(0, 0)
+        self.mask = None
 
 #################
 # Background
