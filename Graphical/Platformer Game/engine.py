@@ -24,11 +24,16 @@ class Vector:
 class Sprite:
     def __init__(self, path: str):
         self.__path: str = path
+        self.__image: pg.Surface = pg.image.load(self.__path)
 
     # Getter
     @property
     def path(self) -> str:
         return self.__path
+
+    @property
+    def image(self) -> pg.Surface:
+        return self.__image
 
 #############
 # Player
@@ -44,19 +49,34 @@ class Background:
     def __init__(self, tile_name: str):
         self.sprite: Sprite = Sprite(os.path.join('assets', "Background", tile_name.capitalize() + '.png'))
 
+    # Generate a list of tiles' positions for background
+    def generate_tiles_position(self, area: Vector) -> list[Vector]:
+        # Get dimensions of the image
+        _, _, width, height = self.sprite.image.get_rect()
+        tiles_positions: list[Vector] = []    # Empty tiles list
+
+        # Append tiles to fit the given area
+        for i in range(area.x // width + 1):
+            for j in range(area.y // height + 1):
+                # Position for current tile
+                position: Vector = Vector(i * width, j * height)
+                tiles_positions.append(position)
+
+        return tiles_positions
+
 ###########
 # Game
 ###########
 class Game:
-    def __init__(self, caption: str, resolution: tuple[int, int]):
+    def __init__(self, caption: str, resolution: Vector):
         pg.init()
         pg.display.set_caption(caption)
 
         self.bg = (255, 255, 255)
-        self.__resolution: tuple[int, int] = resolution
+        self.__resolution: Vector = resolution
         self.__fps: int = settings.game['fps']
 
-        pg.display.set_mode(self.__resolution)
+        pg.display.set_mode(self.__resolution.get_tuple())
 
     # Getters
     @property
@@ -65,7 +85,7 @@ class Game:
         return self.__fps
 
     @property
-    def resolution(self) -> tuple[int, int]:
+    def resolution(self) -> Vector:
         """ Get resolution of the game """
         return self.__resolution
 

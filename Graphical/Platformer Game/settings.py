@@ -1,5 +1,7 @@
+from engine import Vector
+
 game: dict = {
     'title': 'Mask Dude',
-    'resolution': (800, 600),
+    'resolution': Vector(800, 600),
     'fps': 60
 }
