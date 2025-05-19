@@ -37,10 +37,21 @@ class Game:
         pg.display.set_caption(caption)
 
         self.bg = (255, 255, 255)
-        self.resolution: tuple[int, int] = resolution
-        self.fps: int = settings.game['fps']
+        self.__resolution: tuple[int, int] = resolution
+        self.__fps: int = settings.game['fps']
 
-        pg.display.set_mode(self.resolution)
+        pg.display.set_mode(self.__resolution)
+
+    # Getters
+    @property
+    def fps(self) -> int:
+        """ Get FPS of the game """
+        return self.__fps
+
+    @property
+    def resolution(self) -> tuple[int, int]:
+        """ Get resolution of the game """
+        return self.__resolution
 
 #############
 # Engine
@@ -53,8 +64,17 @@ class Engine:
 
     # Start the engine - Play Game
     def start(self) -> None:
+        # Game-loop
         while self.running:
-            pass
+            # Tick the game clock with FPS
+            self.clock.tick(self.game.fps)
+
+            # Event handling
+            for event in pg.event.get():
+                # If user/player click on close button
+                if event.type == pg.QUIT:
+                    self.running = False
+                    break
 
 ###########
 # Demo
