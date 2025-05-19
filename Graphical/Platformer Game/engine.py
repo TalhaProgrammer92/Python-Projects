@@ -38,8 +38,27 @@ class Game:
 
         pg.display.set_mode(self.resolution.get_tuple())
 
+#############
+# Engine
+#############
+class Engine:
+    def __init__(self, game: Game):
+        self.game: Game = game
+
+    # Start the engine - Play Game
+    def start(self) -> None:
+        pass
+
+###########
+# Demo
+###########
+def demo():
+    game: Game = Game('Platformer - Demo', Vector(800, 600))
+    engine: Engine = Engine(game)
+    engine.start()
+
 #########################
 # Testing
 #########################
 if __name__ == '__main__':
-    pass
+    demo()
