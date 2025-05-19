@@ -7,9 +7,6 @@ import random
 import math
 import settings
 
-from pygame.time import Clock
-
-
 #############
 # Vector
 #############
@@ -22,11 +19,30 @@ class Vector:
     get_tuple = lambda self: (self.x, self.y)
 
 #############
+# Sprite
+#############
+class Sprite:
+    def __init__(self, path: str):
+        self.__path: str = path
+
+    # Getter
+    @property
+    def path(self) -> str:
+        return self.__path
+
+#############
 # Player
 #############
 class Player:
     def __init__(self, velocity: int):
         self.velocity: int = velocity
+
+#################
+# Background
+#################
+class Background:
+    def __init__(self, tile_name: str):
+        self.sprite: Sprite = Sprite(os.path.join('assets', "Background", tile_name.capitalize() + '.png'))
 
 ###########
 # Game
@@ -59,7 +75,7 @@ class Game:
 class Engine:
     def __init__(self, game: Game):
         self.game: Game = game
-        self.clock: Clock = pg.time.Clock()
+        self.clock: pg.time.Clock = pg.time.Clock()
         self.running: bool = True
 
     # Start the engine - Play Game
