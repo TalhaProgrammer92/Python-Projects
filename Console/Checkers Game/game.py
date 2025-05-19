@@ -86,3 +86,4 @@ class Piece:
 class Cell:
     def __init__(self, piece: Piece = None):
         pass
+

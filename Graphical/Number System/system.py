@@ -2,9 +2,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as tmsg
-import PyMisc.system as mac
 import PyMisc.number as number
-from PyMisc.variable import constant, resolution
+from PyMisc.variable import resolution
 
 
 ##################
@@ -28,11 +27,21 @@ class MainWindow(tk.Tk):
         self.title("Number System")
 
         # Variables
-        self.numbers = [number.Decimal(), number.Binary(), number.HexaDecimal(), number.Octal()]
+        self.numbers = [
+            number.Custom('', 10, 'decimal'),
+            number.Custom('', 2, 'binary'),
+            number.Custom('', 8, 'octal'),
+            number.Custom('', 16, 'hexadecimal')
+        ]
         self.numbers_names = self.get_numbers_names_list()
         self.entry = tk.StringVar()
         self.combo_from = ttk.Combobox(self, values=self.numbers_names, state="readonly")
         self.combo_to = ttk.Combobox(self, values=self.numbers_names, state="readonly")
+
+        # Dictionary
+        self.system: dict = {}
+        for num in self.numbers:
+            self.system[num.name] = num
 
         # Function call
         self.__appearance()
@@ -40,9 +49,9 @@ class MainWindow(tk.Tk):
     def get_numbers_names_list(self) -> list[str]:
         """ Get list of numbers' names """
         options = []
-        for number in self.numbers:
+        for num in self.numbers:
             # print(number.name)
-            options.append(number.name)
+            options.append(num.name.capitalize())
         return options
 
     def convert_number(self) -> None:
@@ -59,11 +68,25 @@ class MainWindow(tk.Tk):
                 self.entry.set("")
                 return
 
+            # Get ComboBox options
+            _from = self.combo_from.get().lower()
+            _to = self.combo_to.get().lower()
+
+            # If both options are same
+            if _from == _to:
+                tmsg.showerror('Conversion Error', 'You have selected same conversion type as the other number.')
+                return
+
+            # If the number is not valid according to its base
+            if not number.is_valid(entry, self.system[_from].base):
+                tmsg.showerror('Value Error', 'The number you have entered is incorrect')
+                return
+
             # Conversion
-            pass
+            result = number.convert(number.Custom(entry, self.system[_from].base), self.system[_to].base).value
 
             # Reset the entry
-            self.entry.set("")
+            self.entry.set(result)
         else:
             # Messagebox
             tmsg.showerror("Value Error", "You must enter a value before performing any conversion operation")
@@ -71,23 +94,30 @@ class MainWindow(tk.Tk):
     def __appearance(self) -> None:
         """ Set appearance of the window """
         # Label
-        tk.Label(self, text="Number System Convertor", bg="blue", fg="yellow", font=("candara", 20, "bold")).pack(fill=tk.X)
+        tk.Label(self, text="Number System Convertor", bg="blue", fg="yellow", font=("candara", 20, "bold")).pack(
+            fill=tk.X)
 
         # Entry
-        tk.Entry(self, textvariable=self.entry, bg="silver", fg="green", font=("segoe ui", 15, "bold")).pack(fill=tk.X, padx=15, pady=15)
+        tk.Entry(self, textvariable=self.entry, bg="silver", fg="green", font=("segoe ui", 15, "bold")).pack(fill=tk.X,
+                                                                                                             padx=15,
+                                                                                                             pady=15)
 
         # Combo box
-        tk.Label(self, text="Select to convert from", bg="cyan", fg="black", font=("candara", 10, "bold")).pack(fill=tk.X, pady=10)
+        tk.Label(self, text="Select to convert from", bg="cyan", fg="black", font=("candara", 10, "bold")).pack(
+            fill=tk.X, pady=10)
 
         self.combo_from.set(self.numbers_names[0])
         self.combo_from.pack(padx=5, pady=5)
 
-        tk.Label(self, text="Select to convert to", bg="cyan", fg="black", font=("candara", 10, "bold")).pack(fill=tk.X, pady=10)
+        tk.Label(self, text="Select to convert to", bg="cyan", fg="black", font=("candara", 10, "bold")).pack(fill=tk.X,
+                                                                                                              pady=10)
         self.combo_to.set(self.numbers_names[0])
         self.combo_to.pack(padx=5, pady=5)
 
         # Button
-        tk.Button(self, text="Convert", bg="yellow", fg="blue", font=("candara", 20, "bold"), relief="groove", command=self.convert_number).pack(padx=25, pady=25)
+        tk.Button(self, text="Convert", bg="yellow", fg="blue", font=("candara", 20, "bold"), relief="groove",
+                  command=self.convert_number).pack(padx=25, pady=25)
+
 
 ##################
 # Testing
