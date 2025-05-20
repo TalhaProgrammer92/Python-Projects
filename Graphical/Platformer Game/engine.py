@@ -66,21 +66,34 @@ class Player(Object):
         self.speed: int = speed
         self.velocity: Vector = Vector(0, 0)
         self.mask = None
-        self.direction: str = 'left'
         self.animation_count: int = 0
-        self.health_points: int = 50
 
+        self.__direction: str = 'left'
+        self.__health_points: int = 50
+
+    # Getters
+    @property
+    def direction(self) -> str:
+        return self.__direction
+
+    @property
+    def health_points(self) -> int:
+        return self.__health_points
+
+    # Method - Switch direction
     def switch_direction(self, face: str) -> None:
         if face in ['left', 'right']:
-            if self.direction != face:
-                self.direction = face
+            if self.__direction != face:
+                self.__direction = face
                 self.animation_count = 0
 
+    # Method - Move left
     def move_left(self):
         """ Move the player to left """
         self.velocity.x = -self.speed
         self.switch_direction('left')
 
+    # Method - Move right
     def move_right(self):
         """ Move the player to right """
         self.velocity.x = self.speed
