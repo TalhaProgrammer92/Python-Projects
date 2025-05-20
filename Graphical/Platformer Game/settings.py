@@ -5,3 +5,8 @@ game: dict = {
     'resolution': Vector(800, 600),
     'fps': 60
 }
+
+player: dict = {
+    'hp': 50,
+    'speed': 5
+}

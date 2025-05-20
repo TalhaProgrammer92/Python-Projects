@@ -57,6 +57,7 @@ class Object(pg.sprite.Sprite):
         self.rigid_body.x += displacement.x
         self.rigid_body.y += displacement.y
 
+
 #############
 # Player
 #############
@@ -69,7 +70,7 @@ class Player(Object):
         self.animation_count: int = 0
 
         self.__direction: str = 'left'
-        self.__health_points: int = 50
+        self.__health_points: int = settings.player['hp']
 
     # Getters
     @property
@@ -98,6 +99,15 @@ class Player(Object):
         """ Move the player to right """
         self.velocity.x = self.speed
         self.switch_direction('right')
+
+    # Method - Draw the player
+    def draw(self, surface: pg.Surface) -> None:
+        pg.draw.rect(surface, (255, 0, 255), self.rigid_body)
+
+    # Method - Handle movement/animations
+    def handle(self, fps: int) -> None:
+        # Movement
+        self.move(self.velocity.x, self.velocity.y)
 
 
 #################
@@ -159,10 +169,11 @@ class Game:
 # Engine
 #############
 class Engine:
-    def __init__(self, game: Game):
+    def __init__(self, game: Game, player: Player):
         self.game: Game = game
         self.clock: pg.time.Clock = pg.time.Clock()
         self.running: bool = True
+        self.player: Player = player
         self.bg_positions = self.game.bg.generate_tiles_positions(self.game.resolution)
 
     # Start the engine - Play Game
@@ -188,7 +199,15 @@ class Engine:
 ###########
 def demo():
     game: Game = Game(settings.game['title'] + ' - Demo', settings.game['resolution'], Background("gray"))
-    engine: Engine = Engine(game)
+
+    player: Player = Player(
+        speed=settings.player['speed'],
+        sprite=Sprite("assets/MainCharacters/MaskDude/idle.png"),
+        position=Vector(5, 5),
+        size=Vector(2, 2)
+    )
+
+    engine: Engine = Engine(game, player)
     engine.start()
 
 
