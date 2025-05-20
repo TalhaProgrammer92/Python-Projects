@@ -6,112 +6,148 @@ import pygame as pg
 import random
 import math
 
-###################
-# Vector Class
-###################
-class Vector:
-    def __init__(self, y: int, x: int):
-        # * Coordinates
-        self.y: int = y
-        self.x: int = x
-    
-    @property
-    def get(self):
-        """ Return tuple of the vector """
-        return (self.y, self.x)
+from pygame import Surface
 
-###################
-# Sprite Class
-###################
+import settings
+
+#############
+# Vector
+#############
+class Vector:
+    def __init__(self, x: int, y: int):
+        self.x: int = x
+        self.y: int = y
+
+    # Get vector as tuple
+    get_tuple = lambda self: (self.x, self.y)
+
+#############
+# Sprite
+#############
 class Sprite:
     def __init__(self, path: str):
-        self.path: str = path
-    
-    def load(self) -> pg.Surface:
-        """ Load the sprite from the given path """
-        return pg.image.load(self.path).convert_alpha()
-    
-    def rotate(self, angle: int) -> pg.Surface:
-        """ Load & Rotate the sprite at certain angle from the given path """
-        return pg.transform.rotate(self.load, angle)
+        self.__path: str = path
+        self.__image: pg.Surface = pg.image.load(self.__path)
 
-###################
-# Player Class
-###################
-class Player:
-    def __init__(self, speed: int):
-        self.__speed: int = speed
-        
+    # Getter
+    @property
+    def path(self) -> str:
+        return self.__path
+
+    @property
+    def image(self) -> pg.Surface:
+        return self.__image
+
+    def draw(self, surface: pg.Surface, position: Vector) -> None:
+        surface.blit(self.image, position.get_tuple())
+
+#############
+# Object
+#############
+class Object(pg.sprite.Sprite):
+    def __init__(self, sprite: Sprite, position: Vector, size: Vector):
+        super().__init__()
+        self.sprite: Sprite = sprite
+        self.position: Vector = position
+        self.size: Vector = size
+
+#############
+# Player
+#############
+class Player(Object):
+    def __init__(self, speed: int, sprite: Sprite, position: Vector, size: Vector):
+        super().__init__(sprite, position, size)
+        self.speed: int = speed
+        self.velocity: Vector = Vector(0, 0)
+        self.mask = None
 
 #################
-# Game Class
+# Background
 #################
+class Background:
+    def __init__(self, tile_name: str):
+        self.sprite: Sprite = Sprite(os.path.join('assets', "Background", tile_name.capitalize() + '.png'))
+
+    # Generate a list of tiles' positions for background
+    def generate_tiles_positions(self, area: Vector) -> list[Vector]:
+        # Get dimensions of the image
+        _, _, width, height = self.sprite.image.get_rect()
+        tiles_positions: list[Vector] = []    # Empty tiles list
+
+        # Append tiles to fit the given area
+        for i in range(area.x // width + 1):
+            for j in range(area.y // height + 1):
+                # Position for current tile
+                position: Vector = Vector(i * width, j * height)
+                tiles_positions.append(position)
+
+        return tiles_positions
+
+    # Draw the background
+    def draw(self, positions: list[Vector], surface: pg.Surface) -> None:
+        for position in positions:
+            self.sprite.draw(surface, position)
+        pg.display.update()
+
+###########
+# Game
+###########
 class Game:
-    def __init__(self, caption: str, resolution: Vector, player: Player):
-        # * Initialization
+    def __init__(self, caption: str, resolution: Vector, bg: Background):
         pg.init()
         pg.display.set_caption(caption)
 
-        # * Control Variables
-        self.__bg_color: tuple[int, int, int] = (255, 255, 255)
+        self.bg = bg
         self.__resolution: Vector = resolution
-        self.__fps: int = 60
+        self.__fps: int = settings.game['fps']
 
-        # * Game screen initialization
-        self.window = pg.display.set_mode(resolution.get)
+        self.surface: pg.Surface = pg.display.set_mode(self.__resolution.get_tuple())
 
-        # * Game Objects
-        self.player: Player = player
-    
-    # * Getters
-    @property
-    def bg(self):
-        return self.__bg_color
-    
-    @property
-    def resolution(self) -> Vector:
-        return self.__resolution
-    
+    # Getters
     @property
     def fps(self) -> int:
+        """ Get FPS of the game """
         return self.__fps
 
-###################
-# Engine Class
-###################
+    @property
+    def resolution(self) -> Vector:
+        """ Get resolution of the game """
+        return self.__resolution
+
+#############
+# Engine
+#############
 class Engine:
     def __init__(self, game: Game):
-        # * Necessary objects
         self.game: Game = game
-        self.clock = pg.time.Clock()
+        self.clock: pg.time.Clock = pg.time.Clock()
         self.running: bool = True
+        self.bg_positions = self.game.bg.generate_tiles_positions(self.game.resolution)
 
-    def start(self):
-        """ Start the game engine """
+    # Start the engine - Play Game
+    def start(self) -> None:
+        # Game-loop
         while self.running:
-            # ! Tick the FPS
+            # Tick the game clock with FPS
             self.clock.tick(self.game.fps)
-            
-            # ! Handle all events
-            self.handle_events()
 
-        pg.quit()
+            # Event handling
+            for event in pg.event.get():
+                # If user/player click on close button
+                if event.type == pg.QUIT:
+                    self.running = False
+                    break
 
-    def handle_events(self):
-        """ Handle in-game events """
-        for event in pg.event.get():
-            # ! Press close button
-            if event.type == pg.QUIT:
-                self.running = False
-                return
+            # Draw Background
+            self.game.bg.draw(self.bg_positions, self.game.surface)
 
-# ? Demo of the game
+###########
+# Demo
+###########
 def demo():
-    """ Game demo """
-    Engine(
-        Game('Platformer Game - Demo', Vector(1024, 720), Player(5))
-    ).start()
-    quit()
+    game: Game = Game(settings.game['title'] + ' - Demo', settings.game['resolution'], Background("gray"))
+    engine: Engine = Engine(game)
+    engine.start()
 
 #########################
 # Testing
