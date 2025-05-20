@@ -102,8 +102,7 @@ class Player(Object):
 
     # Method - Draw the player
     def draw(self, surface: pg.Surface) -> None:
-        pg.draw.rect(surface, (255, 255, 255), self.rigid_body)
-        pg.display.update()
+        self.sprite.draw(surface, self.position)
 
     # Method - Handle movement/animations
     def handle(self, fps: int) -> None:
@@ -137,7 +136,7 @@ class Background:
     def draw(self, positions: list[Vector], surface: pg.Surface) -> None:
         for position in positions:
             self.sprite.draw(surface, position)
-        pg.display.update()
+        # pg.display.update()
 
 
 ###########
@@ -191,11 +190,14 @@ class Engine:
                     self.running = False
                     break
 
+            # Draw Player
+            self.player.draw(self.game.surface)
+
             # Draw Background
             self.game.bg.draw(self.bg_positions, self.game.surface)
 
-            # Draw Player
-            self.player.draw(self.game.surface)
+            # Update Display
+            pg.display.update()
 
 
 ###########
@@ -208,7 +210,7 @@ def demo():
         speed=settings.player['speed'],
         sprite=Sprite("assets/MainCharacters/MaskDude/idle.png"),
         position=Vector(50, 50),
-        size=Vector(2, 2)
+        size=Vector(5, 5)
     )
 
     engine: Engine = Engine(game, player)
