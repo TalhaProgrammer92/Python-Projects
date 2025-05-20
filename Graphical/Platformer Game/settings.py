@@ -1,3 +1,4 @@
+import pygame as pg
 from engine import Vector
 
 game: dict = {
@@ -7,6 +8,15 @@ game: dict = {
 }
 
 player: dict = {
+    # Stats
     'hp': 50,
-    'speed': 5
+    'speed': 5,
+
+    # Movement control keys
+    'movement_key': {
+        'left': pg.K_LEFT,
+        'right': pg.K_RIGHT,
+        'up': pg.K_UP,
+        'down': pg.K_DOWN
+    }
 }

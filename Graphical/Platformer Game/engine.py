@@ -109,6 +109,22 @@ class Player(Object):
             pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
         )
 
+    # Method - Handle movement events
+    def handle_movement(self) -> None:
+        # Get all keys being pressed
+        keys = pg.key.get_pressed()
+
+        # Prevent continues moving
+        self.velocity.x = 0
+
+        # Move to left
+        if keys[settings.player['movement_key']['left']]:
+            self.move_left()
+
+        # Move to right
+        if keys[settings.player['movement_key']['right']]:
+            self.move_right()
+
     # Method - Handle movement/animations
     def handle(self, fps: int) -> None:
         # Movement
