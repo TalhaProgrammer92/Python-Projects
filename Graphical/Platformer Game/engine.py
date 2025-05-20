@@ -52,6 +52,10 @@ class Object(pg.sprite.Sprite):
         self.size: Vector = size
         self.rigid_body: pg.Rect = pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
 
+    def move(self, displacement: Vector) -> None:
+        """ Move the object """
+        self.rigid_body.x += displacement.x
+        self.rigid_body.y += displacement.y
 
 #############
 # Player
@@ -62,6 +66,25 @@ class Player(Object):
         self.speed: int = speed
         self.velocity: Vector = Vector(0, 0)
         self.mask = None
+        self.direction: str = 'left'
+        self.animation_count: int = 0
+        self.health_points: int = 50
+
+    def switch_direction(self, face: str) -> None:
+        if face in ['left', 'right']:
+            if self.direction != face:
+                self.direction = face
+                self.animation_count = 0
+
+    def move_left(self):
+        """ Move the player to left """
+        self.velocity.x = -self.speed
+        self.switch_direction('left')
+
+    def move_right(self):
+        """ Move the player to right """
+        self.velocity.x = self.speed
+        self.switch_direction('right')
 
 
 #################
