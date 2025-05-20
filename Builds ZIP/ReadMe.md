@@ -1,2 +1,2 @@
 # About
-This directory stores all build zip files of softwares that I created.
+This directory stores all build zip files of softwares which I create.
