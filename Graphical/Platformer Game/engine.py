@@ -5,10 +5,8 @@ import os
 import pygame as pg
 import random
 import math
-
-from pygame import Surface
-
 import settings
+
 
 #############
 # Vector
@@ -20,6 +18,7 @@ class Vector:
 
     # Get vector as tuple
     get_tuple = lambda self: (self.x, self.y)
+
 
 #############
 # Sprite
@@ -41,6 +40,7 @@ class Sprite:
     def draw(self, surface: pg.Surface, position: Vector) -> None:
         surface.blit(self.image, position.get_tuple())
 
+
 #############
 # Object
 #############
@@ -50,6 +50,8 @@ class Object(pg.sprite.Sprite):
         self.sprite: Sprite = sprite
         self.position: Vector = position
         self.size: Vector = size
+        self.rigid_body: pg.Rect = pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
+
 
 #############
 # Player
@@ -60,6 +62,7 @@ class Player(Object):
         self.speed: int = speed
         self.velocity: Vector = Vector(0, 0)
         self.mask = None
+
 
 #################
 # Background
@@ -72,7 +75,7 @@ class Background:
     def generate_tiles_positions(self, area: Vector) -> list[Vector]:
         # Get dimensions of the image
         _, _, width, height = self.sprite.image.get_rect()
-        tiles_positions: list[Vector] = []    # Empty tiles list
+        tiles_positions: list[Vector] = []  # Empty tiles list
 
         # Append tiles to fit the given area
         for i in range(area.x // width + 1):
@@ -88,6 +91,7 @@ class Background:
         for position in positions:
             self.sprite.draw(surface, position)
         pg.display.update()
+
 
 ###########
 # Game
@@ -113,6 +117,7 @@ class Game:
     def resolution(self) -> Vector:
         """ Get resolution of the game """
         return self.__resolution
+
 
 #############
 # Engine
@@ -141,6 +146,7 @@ class Engine:
             # Draw Background
             self.game.bg.draw(self.bg_positions, self.game.surface)
 
+
 ###########
 # Demo
 ###########
@@ -148,6 +154,7 @@ def demo():
     game: Game = Game(settings.game['title'] + ' - Demo', settings.game['resolution'], Background("gray"))
     engine: Engine = Engine(game)
     engine.start()
+
 
 #########################
 # Testing
