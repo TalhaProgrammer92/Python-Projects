@@ -106,7 +106,8 @@ class Player(Object):
         pg.draw.rect(
             surface,
             (0, 255, 255),
-            pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
+            # pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
+            self.rigid_body
         )
 
     # Method - Handle movement events
@@ -126,10 +127,10 @@ class Player(Object):
             self.move_right()
 
     # Method - Handle movement/animations
-    def handle(self, fps: int) -> None:
+    def handle_motion(self, fps: int) -> None:
         # Movement
-        self.move(self.velocity.x, self.velocity.y)
-
+        # self.move(self.velocity.x, self.velocity.y)
+        self.move(self.velocity)
 
 #################
 # Background
@@ -213,6 +214,10 @@ class Engine:
 
             # Draw Background
             self.game.bg.draw(self.bg_positions, self.game.surface)
+
+            # Player - Movement
+            self.player.handle_motion(self.game.fps)
+            self.player.handle_movement()
 
             # Draw Player
             self.player.draw(self.game.surface)
