@@ -55,18 +55,17 @@ class Sprite:
 class HandleSprites:
     def __init__(self, path):
         self.__path: str = path
-        self.__sprite_sheets: list[Sprite] = []
+        # self.__sprite_sheets: list[Sprite] = []
+        self.all_sprites: dict = {}
 
     # Method - Flip sprites
-    def flip(self, flip_x: bool, flip_y: bool) -> list[pg.Surface]:
-        return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in self.__sprite_sheets]
+    def flip(self, sprites: list, flip_x: bool, flip_y: bool) -> list[pg.Surface]:
+        return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in sprites]
 
     # Method - Load sprite sheets
-    def load_sprite_sheets(self, size: Vector, direction: bool = False):
+    def load_sprite_sheets(self, size: Vector, multi_direction: bool = False):
         image_files: list = [file for file in os.listdir(self.__path) if
                         os.path.isfile(os.path.join(self.__path, file))]
-
-        all_sprites: dict = {}
 
         for image in image_files:
             # Load single sprite file
@@ -74,10 +73,20 @@ class HandleSprites:
             sprite.load(convert_alpha=True)
 
             # Load sheets from the single sprite file
+            sprites: list = []
             for i in range(sprite.image.get_width() // size.x):
-                surface: pg.Surface = pg.Surface((size.get_tuple(), pg.SRCALPHA, 32))
-                rect: pg.Rect = pg.Rect(i * size.x, 0, size.x, size.y)
-                surface.blit(sprite.image, (0, 0), rect)
+                sheet: pg.Surface = pg.Surface((size.get_tuple(), pg.SRCALPHA, 32))
+                frame: pg.Rect = pg.Rect(i * size.x, 0, size.x, size.y)
+
+                sheet.blit(sprite.image, (0, 0), frame)
+
+                sprites.append(pg.transform.scale2x(sheet))
+
+            if multi_direction:
+                self.all_sprites[image.replace('.png', '') + '_right'] = sprites
+                self.all_sprites[image.replace('.png', '') + '_left'] = self.flip(sprites, True, False)
+            else:
+                self.all_sprites[image.replace('.png', '') + ''] = sprites
 
 
 #############
