@@ -43,9 +43,15 @@ class Sprite:
         surface.blit(self.image, position.get_tuple())
 
 
-# Function - flip sprites
+# Function - Flip sprites
 def flip_sprites(sprites: list[Sprite], flip_x: bool, flip_y: bool) -> list[pg.Surface]:
     return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in sprites]
+
+
+# Function - Load sprite sheets
+def load_sprite_sheets(path1, path2, size: Vector, direction: bool = False):
+    path = os.path.join('assets', path1, path2)
+    images: list = [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))]
 
 
 #############
