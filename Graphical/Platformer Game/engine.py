@@ -62,15 +62,22 @@ class HandleSprites:
         return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in self.__sprite_sheets]
 
     # Method - Load sprite sheets
-    def load_sprite_sheets(self, direction: bool = False):
+    def load_sprite_sheets(self, size: Vector, direction: bool = False):
         image_files: list = [file for file in os.listdir(self.__path) if
                         os.path.isfile(os.path.join(self.__path, file))]
 
         all_sprites: dict = {}
 
         for image in image_files:
+            # Load single sprite file
             sprite: Sprite = Sprite(os.path.join(self.__path, image))
             sprite.load(convert_alpha=True)
+
+            # Load sheets from the single sprite file
+            for i in range(sprite.image.get_width() // size.x):
+                surface: pg.Surface = pg.Surface((size.get_tuple(), pg.SRCALPHA, 32))
+                rect: pg.Rect = pg.Rect(i * size.x, 0, size.x, size.y)
+                surface.blit(sprite.image, (0, 0), rect)
 
 
 #############
