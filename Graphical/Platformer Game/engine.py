@@ -117,6 +117,8 @@ class Player(Object):
         self.velocity: Vector = Vector(0, 0)
         self.mask = None
         self.animation_count: int = 0
+        self.sprites_handle: HandleSprites = HandleSprites(self.sprite.path)
+        self.sprites_handle.load_sprite_sheets(Vector(32, 32), True)
 
         self.__direction: str = 'left'
         self.__health_points: int = settings.player['hp']
