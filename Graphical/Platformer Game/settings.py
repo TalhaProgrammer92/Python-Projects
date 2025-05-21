@@ -7,6 +7,10 @@ game: dict = {
     'fps': 60
 }
 
+physics: dict = {
+    'gravity': 1
+}
+
 player: dict = {
     # Stats
     'hp': 50,

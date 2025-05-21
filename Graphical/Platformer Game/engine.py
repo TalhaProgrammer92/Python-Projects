@@ -71,6 +71,7 @@ class Player(Object):
 
         self.__direction: str = 'left'
         self.__health_points: int = settings.player['hp']
+        self.__fall_count: int = 0
 
     # Getters
     @property
@@ -129,8 +130,12 @@ class Player(Object):
     # Method - Handle movement/animations
     def handle_motion(self, fps: int) -> None:
         # Movement
-        # self.move(self.velocity.x, self.velocity.y)
+        self.velocity.y += min(1, (self.__fall_count / fps) * settings.physics['gravity'])   # Gravity
         self.move(self.velocity)
+
+        # Increase fall count
+        self.__fall_count += 1
+
 
 #################
 # Background
