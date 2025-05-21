@@ -56,7 +56,7 @@ class HandleSprites:
     def __init__(self, path):
         self.__path: str = path
         # self.__sprite_sheets: list[Sprite] = []
-        self.all_sprites: dict = {}
+        self.sprites_sheets: dict = {}
 
     # Method - Flip sprites
     @staticmethod
@@ -84,10 +84,10 @@ class HandleSprites:
                 sprites.append(pg.transform.scale2x(sheet))
 
             if multi_direction:
-                self.all_sprites[image.replace('.png', '') + '_right'] = sprites
-                self.all_sprites[image.replace('.png', '') + '_left'] = HandleSprites.flip(sprites, True, False)
+                self.sprites_sheets[image.replace('.png', '') + '_right'] = sprites
+                self.sprites_sheets[image.replace('.png', '') + '_left'] = HandleSprites.flip(sprites, True, False)
             else:
-                self.all_sprites[image.replace('.png', '') + ''] = sprites
+                self.sprites_sheets[image.replace('.png', '') + ''] = sprites
 
 
 #############
@@ -155,12 +155,14 @@ class Player(Object):
     # Method - Draw the player
     def draw(self, surface: pg.Surface) -> None:
         # self.sprite.draw(surface, self.position)
-        pg.draw.rect(
-            surface,
-            (0, 255, 255),
-            # pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
-            self.rigid_body
-        )
+        # pg.draw.rect(
+        #     surface,
+        #     (0, 255, 255),
+        #     # pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
+        #     self.rigid_body
+        # )
+        sprite = self.sprites_handle.sprites_sheets['idle_right'][0]
+        surface.blit(sprite, (self.rigid_body.x, self.rigid_body.y))
 
     # Method - Handle movement events
     def handle_movement(self) -> None:
@@ -181,7 +183,7 @@ class Player(Object):
     # Method - Handle movement/animations
     def handle_motion(self, fps: int) -> None:
         # Movement
-        self.velocity.y += min(1, (self.__fall_count / fps) * settings.physics['gravity'])  # Gravity
+        # self.velocity.y += min(1, (self.__fall_count / fps) * settings.physics['gravity'])  # Gravity
         self.move(self.velocity)
 
         # Increase fall count
