@@ -26,7 +26,13 @@ class Vector:
 class Sprite:
     def __init__(self, path: str):
         self.__path: str = path
-        self.__image: pg.Surface = pg.image.load(self.__path)
+        self.__image: pg.Surface | None = None
+
+    def load(self, convert_alpha: bool = False) -> None:
+        if convert_alpha:
+            self.__image = pg.image.load(self.__path).convert_alpha()
+        else:
+            self.__image = pg.image.load(self.__path)
 
     # Getter
     @property
@@ -59,6 +65,12 @@ class HandleSprites:
     def load_sprite_sheets(self, direction: bool = False):
         image_files: list = [file for file in os.listdir(self.__path) if
                         os.path.isfile(os.path.join(self.__path, file))]
+
+        all_sprites: dict = {}
+
+        for image in image_files:
+            sprite: Sprite = Sprite(os.path.join(self.__path, image))
+            sprite.load(convert_alpha=True)
 
 
 #############
@@ -163,6 +175,7 @@ class Player(Object):
 class Background:
     def __init__(self, tile_name: str):
         self.sprite: Sprite = Sprite(os.path.join('assets', "Background", tile_name.capitalize() + '.png'))
+        self.sprite.load()
 
     # Generate a list of tiles' positions for background
     def generate_tiles_positions(self, area: Vector) -> list[Vector]:
