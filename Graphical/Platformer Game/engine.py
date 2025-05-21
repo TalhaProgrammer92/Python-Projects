@@ -76,7 +76,7 @@ class HandleSprites:
             # Load sheets from the single sprite file
             sprites: list = []
             for i in range(sprite.image.get_width() // size.x):
-                sheet: pg.Surface = pg.Surface((size.get_tuple(), pg.SRCALPHA, 32))
+                sheet: pg.Surface = pg.Surface(((float(size.x), float(size.y)), pg.SRCALPHA, 32))
                 frame: pg.Rect = pg.Rect(i * size.x, 0, size.x, size.y)
 
                 sheet.blit(sprite.image, (0, 0), frame)
@@ -111,8 +111,8 @@ class Object(pg.sprite.Sprite):
 # Player
 #############
 class Player(Object):
-    def __init__(self, speed: int, sprite: Sprite, position: Vector, size: Vector):
-        super().__init__(sprite, position, size)
+    def __init__(self, speed: int, character_path: str, position: Vector, size: Vector):
+        super().__init__(Sprite(character_path), position, size)
         self.speed: int = speed
         self.velocity: Vector = Vector(0, 0)
         self.mask = None
@@ -161,7 +161,7 @@ class Player(Object):
         #     # pg.Rect(self.position.x, self.position.y, self.size.x, self.size.y)
         #     self.rigid_body
         # )
-        sprite = self.sprites_handle.sprites_sheets['idle_right'][0]
+        sprite = self.sprites_handle.sprites_sheets['idle_' + self.direction][0]
         surface.blit(sprite, (self.rigid_body.x, self.rigid_body.y))
 
     # Method - Handle movement events
@@ -293,7 +293,7 @@ def demo():
 
     player: Player = Player(
         speed=settings.player['speed'],
-        sprite=Sprite("assets/MainCharacters/MaskDude/idle.png"),
+        character_path="assets/MainCharacters/MaskDude",
         position=Vector(50, 50),
         size=Vector(50, 50)
     )
