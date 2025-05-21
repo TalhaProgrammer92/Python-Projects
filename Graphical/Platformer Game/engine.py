@@ -37,8 +37,15 @@ class Sprite:
     def image(self) -> pg.Surface:
         return self.__image
 
+    # Method - Draw sprite on screen
     def draw(self, surface: pg.Surface, position: Vector) -> None:
+        """ Draw the image at given position """
         surface.blit(self.image, position.get_tuple())
+
+
+# Function - flip sprites
+def flip_sprites(sprites: list[Sprite], flip_x: bool, flip_y: bool) -> list[pg.Surface]:
+    return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in sprites]
 
 
 #############
@@ -130,7 +137,7 @@ class Player(Object):
     # Method - Handle movement/animations
     def handle_motion(self, fps: int) -> None:
         # Movement
-        self.velocity.y += min(1, (self.__fall_count / fps) * settings.physics['gravity'])   # Gravity
+        self.velocity.y += min(1, (self.__fall_count / fps) * settings.physics['gravity'])  # Gravity
         self.move(self.velocity)
 
         # Increase fall count
