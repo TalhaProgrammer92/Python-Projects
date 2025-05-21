@@ -59,7 +59,8 @@ class HandleSprites:
         self.all_sprites: dict = {}
 
     # Method - Flip sprites
-    def flip(self, sprites: list, flip_x: bool, flip_y: bool) -> list[pg.Surface]:
+    @staticmethod
+    def flip(sprites: list, flip_x: bool, flip_y: bool) -> list[pg.Surface]:
         return [pg.transform.flip(sprite.image, flip_x, flip_y) for sprite in sprites]
 
     # Method - Load sprite sheets
@@ -84,7 +85,7 @@ class HandleSprites:
 
             if multi_direction:
                 self.all_sprites[image.replace('.png', '') + '_right'] = sprites
-                self.all_sprites[image.replace('.png', '') + '_left'] = self.flip(sprites, True, False)
+                self.all_sprites[image.replace('.png', '') + '_left'] = HandleSprites.flip(sprites, True, False)
             else:
                 self.all_sprites[image.replace('.png', '') + ''] = sprites
 
