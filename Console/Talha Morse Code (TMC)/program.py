@@ -1,3 +1,8 @@
+import sys
+
+# ? Set for emoji
+def set_utf8():
+	sys.stdout.reconfigure(encoding='utf-8')
 
 # ? Encode
 def encode(text: str, key: list[str] | str) -> list[str]:
