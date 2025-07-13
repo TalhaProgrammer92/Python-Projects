@@ -37,9 +37,10 @@ def decode(morse: list[str], key: list[str] | str) -> str:
 	return text
 
 # ? Testing
-text: str = "My name is Taha Ahmad."
-key: str = ['+', '-', '*', '/']
-morse: list[str] = encode(text, key)
+if '__main__' == __name__:
+	text: str = "My name is Taha Ahmad."
+	key: str = ['+', '-', '*', '/']
+	morse: list[str] = encode(text, key)
 
-print('Morse: ', ' '.join(morse))
-print('Text: ', decode(morse, key))
+	print('Morse: ', ' '.join(morse))
+	print('Text: ', decode(morse, key))
