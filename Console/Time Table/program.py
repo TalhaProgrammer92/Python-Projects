@@ -6,7 +6,7 @@ import string
 def double_digit_value(value: int) -> str | None:
     if value > 99: return None
     
-    return f'0{value}' if value <= 9 else str(value)
+    return f"{value:02}" if value <= 9 else str(value)
 
 #############################################
 # ? Time Class - Handles time for events
@@ -52,7 +52,7 @@ class Time:
     @hours.setter
     def hours(self, value: int):
         if self.is_hours_valid(value):
-            self.__hours
+            self.__hours = value
     
     # * Representation method
     def __repr__(self) -> str:
@@ -111,7 +111,7 @@ class EventsList:
         
         # TODO: Finding the given event in the list
         for event in self.events:
-            if event_name.lower == event.event.lower:
+            if event_name.lower() == event.event.lower():
                 return event
         
         # ! If no event found
