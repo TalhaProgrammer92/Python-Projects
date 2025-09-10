@@ -4,6 +4,7 @@ import PyMisc.color as clr
 
 def window() -> pt.Grid:
     _window: pt.Grid = pt.Grid(var.size(8, 14))
+    little_window: pt.Grid = pt.Grid(var.size(4, 6))
 
     # Box
     box: pt.Grid = pt.Grid(var.size(1, 2))
@@ -21,12 +22,14 @@ def window() -> pt.Grid:
         _window.insert_grid(var.position(count, 0), box)
         _window.insert_grid(var.position(count, _window.width - 2), box)
 
+        if count % 2:
+            # little_window.insert_grid(var.position(, ))
+            pass
+
     # Borders - Horizontal
     for count in range(0, 6 * 2, 2):
         _window.insert_grid(var.position(0, count), box)
-        # print(var.position(0, count))
         _window.insert_grid(var.position(_window.height - 1, count), box)
-        # print(var.position(_window.height - 1, count))
 
     return _window
 
