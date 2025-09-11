@@ -57,15 +57,15 @@ if __name__ == "__main__":
     # else:
     #     print(result)
     # print(type(get_countries()))
-    visited: list[str] = ['australia', 'afghanistan', 'aruba', 'angola', 'anguilla', 'åland islands']
+    visited: list[str] = ['australia', 'afghanistan', 'aruba', 'angola', 'anguilla', 'åland islands', 'australia', 'afghanistan', 'aruba', 'angola', 'anguilla', 'åland islands', 'albania', 'andorra', 'united arab emirates', 'argentina', 'armenia', 'american samoa', 'french southern territories', 'antigua and barbuda', 'austria', 'azerbaijan', 'burundi', 'belgium', 'benin', 'bonaire, sint eustatius and saba', 'burkina faso', 'bangladesh', 'bulgaria', 'bahrain', 'bahamas', 'bosnia and herzegovina', 'saint barthélemy', 'belarus', 'belize', 'bermuda', 'bolivia, plurinational state of', 'brazil', 'barbados', 'brunei darussalam', 'bhutan', 'botswana', 'central african republic', 'canada', 'cocos (keeling) islands', 'switzerland', 'chile', 'china', "côte d'ivoire", 'cameroon', 'congo, the democratic republic of the', 'congo', 'cook islands', 'colombia']
 
     json: list[str] = []
     print("fetching...")
-    for country in get_countries()[:50]:
+    for country in get_countries():
         if country.lower() not in visited:
             try:
                 json.append(get_cities_JSON(country))
-                visited.append(country.lower())
+                # visited.append(country.lower())
             except Exception:
                 continue
     print('{"countries":[' + ",".join(json) + "]}")
