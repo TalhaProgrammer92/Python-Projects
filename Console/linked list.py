@@ -93,66 +93,45 @@ class List:
         return _ + 'None'
 
 
-# Function - Swap two nodes
-def swap(head: Node | None, node1: Node, node2: Node) -> None:
-    node1.next = node2.next
-    node2.next = node1
-    if head is not None:
-        head.next = node2
-
-
-# Function - Sort a linked list in ascending order [Bug]
-def sort(_list: List) -> None:
-    size: int = _list.size
-
-    for i in range(size - 1):
-        head: Node = _list.head
-        swapped: bool = False
-        for j in range(size - i - 1):
-            node1: Node = _list.at(j)
-            node2: Node = node1.next
-            tail: Node = _list.tail
-
-            # Debugging
-            print(f"Node1: {node1 if node1 is Node else node1.data} | Node2: {node2 if node2 is None else node2.data}",
-                  f"Head: {head if head is Node else head.data} | Tail: {tail if tail is None else tail.data}",
-                  sep=' || ')
-
-            if node1.data > node2.data:
-                swap(head if head is not node1 else None, node1, node2)
-                swapped = True
-
-                # Update head & tail
-                if head is node1:
-                    _list.head = node2
-                if tail is node2:
-                    _list.tail = node1
-
-                # Debugging
-                print("[Swapped]")
-                print(
-                    f"Node1: {node1 if node1 is Node else node1.data} | Node2: {node2 if node2 is None else node2.data}",
-                    f"Head: {head if head is Node else head.data} | Tail: {tail if tail is None else tail.data}",
-                    sep=' || ')
-
-            if not swapped:
-                return
-
-
 if __name__ == '__main__':
     _list: List = List()
 
-    _list.push_back(5)
-    _list.push_back(4)
-    _list.push_back(3)
     _list.push_back(2)
     _list.push_back(1)
+    _list.push_back(5)
+    _list.push_back(3)
+    _list.push_back(4)
 
-    # _list.pop_back()
-    # _list.pop_front()
+    print('Original:', _list, sep='\t')
 
-    print(_list)
+    # Sort the list -- Bubble Sort Algorithm
+    size: int = _list.size
+    for i in range(size - 1):
+        swapped: bool = False
 
-    sort(_list)
+        for j in range(size - i - 1):
+            node1: Node = _list.at(j)
+            node2: Node = node1.next
 
-    print(_list)
+            # Compare & Swap
+            if node1.data > node2.data:
+                # Update head
+                if _list.head is node1:
+                    _list.head = node2
+
+                # Update tail
+                if _list.tail is node2:
+                    _list.tail = node1
+
+                # Swap nodes
+                node1.next = node2.next
+                node2.next = node1
+
+                swapped = True
+
+            # Break the loop if no swap happened
+            if not swapped:
+                i = size    # Outer loop
+                break       # Inner loop
+
+    print('Sorted:', _list, sep='\t')
