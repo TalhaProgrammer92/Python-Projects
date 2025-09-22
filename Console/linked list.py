@@ -102,7 +102,7 @@ if __name__ == '__main__':
     _list.push_back(3)
     _list.push_back(4)
 
-    print('Original:', _list, sep='\t')
+    # print('Original:', _list, sep='\t')
 
     # Sort the list -- Bubble Sort Algorithm
     size: int = _list.size
@@ -112,6 +112,11 @@ if __name__ == '__main__':
         for j in range(size - i - 1):
             node1: Node = _list.at(j)
             node2: Node = node1.next
+
+            # Debugging...
+            print('List:\t', _list)
+            print(f"Node1:\t{node1 if node1 is None else node1.data} | Node2:\t{node2 if node2 is None else node2.data}",
+                  f"Head:\t{_list.head.data} | Tail:\t{_list.tail.data}", sep=' || ')
 
             # Compare & Swap
             if node1.data > node2.data:
@@ -129,9 +134,18 @@ if __name__ == '__main__':
 
                 swapped = True
 
+            if swapped:
+                # Debugging...
+                print("[Swapped]")
+                n1: Node = _list.at(j)
+                n2: Node = n1.next
+                print(
+                    f"Node1:\t{n1 if n1 is None else n1.data} | Node2:\t{n2 if n2 is None else n2.data}",
+                    f"Head:\t{_list.head.data} | Tail:\t{_list.tail.data}", sep=' || ', end='\n\n')
+
             # Break the loop if no swap happened
             if not swapped:
                 i = size    # Outer loop
                 break       # Inner loop
 
-    print('Sorted:', _list, sep='\t')
+    # print('Sorted:', _list, sep='\t')
