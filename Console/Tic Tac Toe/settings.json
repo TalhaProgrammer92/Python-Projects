@@ -1,0 +1,13 @@
+{
+  "grid-color": "yellow",
+  "player1-color": "red",
+  "player2-color": "cyan",
+
+  "display-errors": false,
+  "display-warnings": true,
+  "auto-load": false,
+
+  "default-player1-symbol": "X",
+  "default-player2-symbol": "O",
+  "default-box-symbol": "-"
+}
