@@ -4,7 +4,7 @@ from pathlib import Path
 def count_lines(file_path):
     try:
         with file_path.open("r", encoding="utf-8", errors="ignore") as file:
-            return sum(1 for _ in file)
+            return sum(1 for line in file if line.strip())
     except (OSError, UnicodeError):
         return 0
 
